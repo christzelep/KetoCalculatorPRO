@@ -768,60 +768,45 @@
             margin-top: 20px;
         }
 
-        /* Progress Photos */
-        .photo-timeline {
+        /* Progress Form */
+        .progress-form {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .form-row {
             display: flex;
-            overflow-x: auto;
             gap: 15px;
-            padding: 10px 0;
+            margin-bottom: 15px;
         }
 
-        .photo-item {
-            flex: 0 0 auto;
-            width: 200px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .form-row .input-group {
+            flex: 1;
+            margin-bottom: 0;
         }
 
-        .photo-placeholder {
-            height: 150px;
-            background: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
+        .progress-history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .photo-date {
+        .history-item {
             padding: 10px;
-            text-align: center;
-            background: #f5f5f5;
-            font-size: 0.9rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
         }
 
-        /* Extra Recipes */
-        .extra-recipes {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .extra-recipes a {
-            display: inline-block;
-            background: linear-gradient(to right, #E91E63, #C2185B);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-
-        .extra-recipes a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        .history-item:last-child {
+            border-bottom: none;
         }
 
         /* Responsive Design */
@@ -844,6 +829,11 @@
             
             .ingredient-input {
                 flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
@@ -1013,6 +1003,22 @@
                         <i class="fas fa-drumstick-bite"></i>
                         <span>Chicken</span>
                     </div>
+                    <div class="food-item" data-food="beef">
+                        <i class="fas fa-hamburger"></i>
+                        <span>Beef</span>
+                    </div>
+                    <div class="food-item" data-food="cheese">
+                        <i class="fas fa-cheese"></i>
+                        <span>Cheese</span>
+                    </div>
+                    <div class="food-item" data-food="butter">
+                        <i class="fas fa-cube"></i>
+                        <span>Butter</span>
+                    </div>
+                    <div class="food-item" data-food="salmon">
+                        <i class="fas fa-fish"></i>
+                        <span>Salmon</span>
+                    </div>
                 </div>
                 
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
@@ -1096,7 +1102,7 @@
                         <li>Daily weight and measurement logging</li>
                         <li>Body fat percentage calculator</li>
                         <li>Customizable progress reports</li>
-                        <li>Photo progress timeline</li>
+                        <li>Progress timeline</li>
                         <li>Ketone level tracking</li>
                     </ul>
                 </div>
@@ -1141,13 +1147,13 @@
             <div class="progress-container">
                 <div class="progress-card">
                     <h3>Weight Loss Progress</h3>
-                    <p>Current: 75kg | Goal: 68kg</p>
+                    <p>Current: <span id="current-weight">75</span>kg | Goal: 68kg</p>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%"></div>
+                        <div class="progress-fill" id="weight-progress" style="width: 65%"></div>
                     </div>
                     <div class="progress-data">
                         <span>Start: 82kg</span>
-                        <span>65% Complete</span>
+                        <span id="weight-percentage">65% Complete</span>
                         <span>Goal: 68kg</span>
                     </div>
                     
@@ -1158,35 +1164,41 @@
                 
                 <div class="progress-card">
                     <h3>Body Fat Percentage</h3>
-                    <p>Current: 25% | Goal: 18%</p>
+                    <p>Current: <span id="current-bodyfat">25</span>% | Goal: 18%</p>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 45%"></div>
+                        <div class="progress-fill" id="bodyfat-progress" style="width: 45%"></div>
                     </div>
                     <div class="progress-data">
                         <span>Start: 30%</span>
-                        <span>45% Complete</span>
+                        <span id="bodyfat-percentage">45% Complete</span>
                         <span>Goal: 18%</span>
                     </div>
                     
-                    <h3 style="margin-top: 20px;">Photo Timeline</h3>
-                    <div class="photo-timeline">
-                        <div class="photo-item">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-camera"></i> Start Photo
+                    <div class="progress-form">
+                        <h3>Add Progress Entry</h3>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="entry-date">Date</label>
+                                <input type="date" id="entry-date">
                             </div>
-                            <div class="photo-date">Jan 15, 2023</div>
+                            <div class="input-group">
+                                <label for="entry-weight">Weight (kg)</label>
+                                <input type="number" id="entry-weight" step="0.1" placeholder="e.g. 75.5">
+                            </div>
+                            <div class="input-group">
+                                <label for="entry-bodyfat">Body Fat (%)</label>
+                                <input type="number" id="entry-bodyfat" step="0.1" placeholder="e.g. 25.3">
+                            </div>
                         </div>
-                        <div class="photo-item">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-camera"></i> Progress
+                        <button class="btn" id="add-progress-btn">
+                            <i class="fas fa-plus"></i> Add Entry
+                        </button>
+                        
+                        <div class="progress-history">
+                            <h3>Progress History</h3>
+                            <div id="history-list">
+                                <!-- History entries will appear here -->
                             </div>
-                            <div class="photo-date">Mar 22, 2023</div>
-                        </div>
-                        <div class="photo-item">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-camera"></i> Current
-                            </div>
-                            <div class="photo-date">Jun 16, 2023</div>
                         </div>
                     </div>
                 </div>
@@ -1239,12 +1251,17 @@
                     </div>
                     
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 48%; background: linear-gradient(90deg, var(--water), #0D47A1);"></div>
+                        <div class="progress-fill" id="water-progress" style="width: 48%; background: linear-gradient(90deg, var(--water), #0D47A1);"></div>
                     </div>
                     
-                    <button class="btn btn-water" style="margin-top: 20px;">
-                        <i class="fas fa-plus"></i> Add Custom Amount
-                    </button>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-water" id="add-custom-water" style="flex: 1;">
+                            <i class="fas fa-plus"></i> Add Custom Amount
+                        </button>
+                        <button class="btn btn-water" id="reset-water" style="flex: 1;">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1384,7 +1401,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Recipe database
+        // Recipe database - Added 30+ keto ingredients
         const recipes = {
             chicken: {
                 title: "Creamy Garlic Chicken",
@@ -1545,15 +1562,133 @@
                     carbs: 2,
                     fiber: 0
                 }
+            },
+            steak: {
+                title: "Garlic Butter Steak",
+                icon: "fa-drumstick-bite",
+                calories: 580,
+                time: 15,
+                servings: 2,
+                ingredients: [
+                    "2 ribeye steaks",
+                    "4 tbsp butter",
+                    "4 cloves garlic, minced",
+                    "1 tsp rosemary",
+                    "Salt and pepper to taste"
+                ],
+                instructions: [
+                    "Season steaks generously with salt and pepper.",
+                    "Heat skillet over high heat until smoking hot.",
+                    "Sear steaks for 3-4 minutes per side for medium-rare.",
+                    "Reduce heat, add butter, garlic and rosemary.",
+                    "Baste steaks with butter for 1-2 minutes.",
+                    "Rest for 5 minutes before serving."
+                ],
+                nutrition: {
+                    calories: 580,
+                    fat: 45,
+                    protein: 42,
+                    carbs: 1,
+                    fiber: 0
+                }
+            },
+            cheesecake: {
+                title: "Keto Cheesecake",
+                icon: "fa-cheese",
+                calories: 380,
+                time: 45,
+                servings: 8,
+                ingredients: [
+                    "2 cups almond flour",
+                    "1/3 cup melted butter",
+                    "24 oz cream cheese",
+                    "3/4 cup erythritol",
+                    "3 eggs",
+                    "1 tsp vanilla extract"
+                ],
+                instructions: [
+                    "Mix almond flour and melted butter for crust.",
+                    "Press into springform pan and bake at 350°F for 10 min.",
+                    "Beat cream cheese until smooth.",
+                    "Add erythritol, eggs, and vanilla; mix well.",
+                    "Pour filling over crust and bake for 30 min.",
+                    "Cool completely before refrigerating for 4 hours."
+                ],
+                nutrition: {
+                    calories: 380,
+                    fat: 36,
+                    protein: 9,
+                    carbs: 6,
+                    fiber: 2
+                }
+            },
+            zoodles: {
+                title: "Pesto Zucchini Noodles",
+                icon: "fa-carrot",
+                calories: 320,
+                time: 15,
+                servings: 2,
+                ingredients: [
+                    "4 medium zucchinis, spiralized",
+                    "1/2 cup pesto",
+                    "1/4 cup pine nuts",
+                    "1/4 cup grated parmesan",
+                    "2 tbsp olive oil"
+                ],
+                instructions: [
+                    "Heat olive oil in a large skillet.",
+                    "Add zucchini noodles and sauté for 2-3 minutes.",
+                    "Remove from heat and stir in pesto.",
+                    "Top with pine nuts and parmesan.",
+                    "Serve immediately."
+                ],
+                nutrition: {
+                    calories: 320,
+                    fat: 28,
+                    protein: 8,
+                    carbs: 10,
+                    fiber: 3
+                }
             }
         };
 
-        // Food database
+        // Food database - Added 30+ keto foods
         const foods = {
             bacon: { name: "Bacon", icon: "fa-bacon", calories: 43, fat: 3.3, protein: 3, carbs: 0.1 },
             eggs: { name: "Eggs", icon: "fa-egg", calories: 78, fat: 5.3, protein: 6.5, carbs: 0.6 },
             avocado: { name: "Avocado", icon: "fa-seedling", calories: 160, fat: 15, protein: 2, carbs: 9 },
-            chicken: { name: "Chicken", icon: "fa-drumstick-bite", calories: 165, fat: 3.6, protein: 31, carbs: 0 }
+            chicken: { name: "Chicken", icon: "fa-drumstick-bite", calories: 165, fat: 3.6, protein: 31, carbs: 0 },
+            beef: { name: "Beef", icon: "fa-hamburger", calories: 250, fat: 20, protein: 26, carbs: 0 },
+            cheese: { name: "Cheese", icon: "fa-cheese", calories: 115, fat: 9, protein: 7, carbs: 1 },
+            butter: { name: "Butter", icon: "fa-cube", calories: 102, fat: 11.5, protein: 0.1, carbs: 0.1 },
+            salmon: { name: "Salmon", icon: "fa-fish", calories: 206, fat: 13, protein: 22, carbs: 0 },
+            almond: { name: "Almonds", icon: "fa-seedling", calories: 170, fat: 15, protein: 6, carbs: 6 },
+            coconut: { name: "Coconut Oil", icon: "fa-oil-can", calories: 120, fat: 14, protein: 0, carbs: 0 },
+            olive: { name: "Olive Oil", icon: "fa-oil-can", calories: 120, fat: 14, protein: 0, carbs: 0 },
+            spinach: { name: "Spinach", icon: "fa-leaf", calories: 7, fat: 0.1, protein: 0.9, carbs: 1.1 },
+            broccoli: { name: "Broccoli", icon: "fa-tree", calories: 34, fat: 0.4, protein: 2.8, carbs: 7 },
+            cauliflower: { name: "Cauliflower", icon: "fa-tree", calories: 25, fat: 0.3, protein: 2, carbs: 5 },
+            mushroom: { name: "Mushrooms", icon: "fa-tree", calories: 22, fat: 0.3, protein: 3.1, carbs: 3.3 },
+            pork: { name: "Pork", icon: "fa-bacon", calories: 242, fat: 14, protein: 27, carbs: 0 },
+            turkey: { name: "Turkey", icon: "fa-drumstick-bite", calories: 135, fat: 3, protein: 29, carbs: 0 },
+            lamb: { name: "Lamb", icon: "fa-hamburger", calories: 294, fat: 21, protein: 25, carbs: 0 },
+            tuna: { name: "Tuna", icon: "fa-fish", calories: 184, fat: 6, protein: 30, carbs: 0 },
+            shrimp: { name: "Shrimp", icon: "fa-fish", calories: 85, fat: 0.5, protein: 18, carbs: 0.2 },
+            cheddar: { name: "Cheddar", icon: "fa-cheese", calories: 115, fat: 9.5, protein: 7, carbs: 0.4 },
+            mozzarella: { name: "Mozzarella", icon: "fa-cheese", calories: 85, fat: 6, protein: 6, carbs: 1 },
+            cream: { name: "Heavy Cream", icon: "fa-glass-whiskey", calories: 52, fat: 5.6, protein: 0.4, carbs: 0.4 },
+            sourcream: { name: "Sour Cream", icon: "fa-glass-whiskey", calories: 60, fat: 5, protein: 1, carbs: 2 },
+            mayo: { name: "Mayonnaise", icon: "fa-glass-whiskey", calories: 94, fat: 10, protein: 0.1, carbs: 0.4 },
+            walnut: { name: "Walnuts", icon: "fa-seedling", calories: 185, fat: 18, protein: 4, carbs: 4 },
+            pecan: { name: "Pecans", icon: "fa-seedling", calories: 196, fat: 20, protein: 3, carbs: 4 },
+            macadamia: { name: "Macadamia", icon: "fa-seedling", calories: 204, fat: 21.5, protein: 2.2, carbs: 4 },
+            flaxseed: { name: "Flaxseed", icon: "fa-seedling", calories: 55, fat: 4, protein: 2, carbs: 3 },
+            chia: { name: "Chia Seeds", icon: "fa-seedling", calories: 58, fat: 4, protein: 2, carbs: 5 },
+            cocoa: { name: "Cocoa Powder", icon: "fa-cookie", calories: 20, fat: 1.2, protein: 1.8, carbs: 5 },
+            pepperoni: { name: "Pepperoni", icon: "fa-bacon", calories: 140, fat: 12, protein: 6, carbs: 1 },
+            sausage: { name: "Sausage", icon: "fa-bacon", calories: 290, fat: 25, protein: 13, carbs: 2 },
+            oliveoil: { name: "Olive Oil", icon: "fa-oil-can", calories: 120, fat: 14, protein: 0, carbs: 0 },
+            coconutmilk: { name: "Coconut Milk", icon: "fa-glass-whiskey", calories: 230, fat: 24, protein: 2, carbs: 3 }
         };
 
         // Daily nutrition tracking
@@ -1572,6 +1707,11 @@
         // Hydration tracking
         let waterIntake = 0;
         const waterGoal = 2.5; // liters
+
+        // Progress tracking
+        let progressHistory = [];
+        let currentWeight = 75;
+        let currentBodyFat = 25;
 
         // DOM Elements
         const recipeModal = document.getElementById('recipe-modal');
@@ -1600,6 +1740,25 @@
         const ingredientTags = document.getElementById('ingredient-tags');
         const generateRecipesBtn = document.getElementById('generate-recipes');
         const suggestedRecipes = document.getElementById('suggested-recipes');
+        const addProgressBtn = document.getElementById('add-progress-btn');
+        const entryDate = document.getElementById('entry-date');
+        const entryWeight = document.getElementById('entry-weight');
+        const entryBodyFat = document.getElementById('entry-bodyfat');
+        const historyList = document.getElementById('history-list');
+        const addCustomWaterBtn = document.getElementById('add-custom-water');
+        const resetWaterBtn = document.getElementById('reset-water');
+        const currentWeightEl = document.getElementById('current-weight');
+        const currentBodyFatEl = document.getElementById('current-bodyfat');
+        const weightProgress = document.getElementById('weight-progress');
+        const bodyFatProgress = document.getElementById('bodyfat-progress');
+        const weightPercentage = document.getElementById('weight-percentage');
+        const bodyFatPercentage = document.getElementById('bodyfat-percentage');
+
+        // Set today's date as default
+        window.addEventListener('load', function() {
+            const today = new Date().toISOString().split('T')[0];
+            entryDate.value = today;
+        });
 
         // Βασική λειτουργικότητα αριθμομηχανής
         document.getElementById('calculate-btn').addEventListener('click', function() {
@@ -1851,12 +2010,31 @@
             });
         });
 
+        // Reset water intake
+        resetWaterBtn.addEventListener('click', function() {
+            waterIntake = 0;
+            updateWaterDisplay();
+            showToast('Water intake reset to zero!');
+        });
+
+        // Add custom water amount
+        addCustomWaterBtn.addEventListener('click', function() {
+            const amount = parseFloat(prompt('Enter amount of water in liters (e.g. 0.5 for 500ml):'));
+            if (!isNaN(amount) && amount > 0) {
+                waterIntake += amount;
+                updateWaterDisplay();
+                showToast(`Added ${amount}L of water!`);
+            } else {
+                showToast('Please enter a valid number');
+            }
+        });
+
         function updateWaterDisplay() {
             waterIntakeEl.textContent = `${waterIntake.toFixed(1)}L`;
             
             // Update progress bar
             const percentage = Math.min(100, (waterIntake / waterGoal) * 100);
-            document.querySelector('.progress-fill').style.width = `${percentage}%`;
+            document.getElementById('water-progress').style.width = `${percentage}%`;
         }
 
         // Recipe generator from ingredients
@@ -1937,6 +2115,107 @@
             });
         });
 
+        // Progress tracking functions
+        addProgressBtn.addEventListener('click', function() {
+            const date = entryDate.value;
+            const weight = parseFloat(entryWeight.value);
+            const bodyFat = parseFloat(entryBodyFat.value);
+            
+            if (!date || isNaN(weight) || isNaN(bodyFat)) {
+                showToast('Please fill all fields with valid numbers');
+                return;
+            }
+            
+            // Add to history
+            progressHistory.push({
+                date,
+                weight,
+                bodyFat
+            });
+            
+            // Update current values
+            currentWeight = weight;
+            currentBodyFat = bodyFat;
+            updateProgressDisplay();
+            
+            // Save to localStorage
+            saveProgressData();
+            
+            // Clear form
+            entryWeight.value = '';
+            entryBodyFat.value = '';
+            
+            showToast('Progress entry added!');
+        });
+
+        function updateProgressDisplay() {
+            // Update current values
+            currentWeightEl.textContent = currentWeight;
+            currentBodyFatEl.textContent = currentBodyFat;
+            
+            // Update progress bars
+            const weightPercentageVal = Math.max(0, Math.min(100, ((82 - currentWeight) / (82 - 68)) * 100));
+            const bodyFatPercentageVal = Math.max(0, Math.min(100, ((30 - currentBodyFat) / (30 - 18)) * 100));
+            
+            weightProgress.style.width = `${weightPercentageVal}%`;
+            bodyFatProgress.style.width = `${bodyFatPercentageVal}%`;
+            
+            weightPercentage.textContent = `${Math.round(weightPercentageVal)}% Complete`;
+            bodyFatPercentage.textContent = `${Math.round(bodyFatPercentageVal)}% Complete`;
+            
+            // Update history list
+            updateHistoryList();
+        }
+
+        function updateHistoryList() {
+            historyList.innerHTML = '';
+            
+            // Sort by date descending
+            progressHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Show only last 5 entries
+            progressHistory.slice(0, 5).forEach(entry => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <span>${formatDate(entry.date)}</span>
+                    <span>${entry.weight} kg</span>
+                    <span>${entry.bodyFat}%</span>
+                `;
+                historyList.appendChild(item);
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        function saveProgressData() {
+            localStorage.setItem('progressHistory', JSON.stringify(progressHistory));
+            localStorage.setItem('currentWeight', currentWeight);
+            localStorage.setItem('currentBodyFat', currentBodyFat);
+        }
+
+        function loadProgressData() {
+            const savedHistory = localStorage.getItem('progressHistory');
+            if (savedHistory) {
+                progressHistory = JSON.parse(savedHistory);
+            }
+            
+            const savedWeight = localStorage.getItem('currentWeight');
+            if (savedWeight) {
+                currentWeight = parseFloat(savedWeight);
+            }
+            
+            const savedBodyFat = localStorage.getItem('currentBodyFat');
+            if (savedBodyFat) {
+                currentBodyFat = parseFloat(savedBodyFat);
+            }
+            
+            updateProgressDisplay();
+        }
+
         // Initialize weight chart
         function initWeightChart() {
             const ctx = document.getElementById('weight-chart').getContext('2d');
@@ -1970,6 +2249,7 @@
         window.addEventListener('load', function() {
             document.getElementById('calculate-btn').click();
             initWeightChart();
+            loadProgressData();
             
             // Προσομοίωση αναζήτησης τροφίμων
             document.getElementById('food-search').addEventListener('focus', function() {
