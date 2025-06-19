@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Keto Macro Calculator - Προσωποποιημένο πλάνο διατροφής">
-    <meta name="theme-color" content="#317EFB">
     <title>Keto Macro Calculator - Full Version</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,6 +16,7 @@
             --danger: #e74c3c;
             --warning: #f39c12;
             --success: #2ecc71;
+            --gray: #6c757d;
         }
         
         * {
@@ -31,10 +30,15 @@
             line-height: 1.6;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            min-height: 100vh;
         }
         
         header {
@@ -68,6 +72,7 @@
         .tagline {
             color: #666;
             font-size: 1.1rem;
+            margin-bottom: 15px;
         }
         
         .premium-badge {
@@ -77,7 +82,6 @@
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
-            margin-top: 10px;
             font-size: 0.9rem;
         }
         
@@ -208,6 +212,14 @@
             background: #c0392b;
         }
         
+        button.warning {
+            background: var(--warning);
+        }
+        
+        button.warning:hover {
+            background: #e67e22;
+        }
+        
         /* Recipe Generator */
         .recipes-grid {
             display: grid;
@@ -243,6 +255,8 @@
             padding: 15px;
             margin: 0;
             color: var(--dark);
+            font-size: 1.2rem;
+            min-height: 70px;
         }
         
         .recipe-meta {
@@ -307,6 +321,12 @@
             gap: 30px;
         }
         
+        @media (max-width: 768px) {
+            .recipe-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .recipe-detail img {
             width: 100%;
             border-radius: 8px;
@@ -340,6 +360,12 @@
             gap: 20px;
         }
         
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .chart-box {
             background: white;
             padding: 20px;
@@ -358,6 +384,12 @@
             gap: 20px;
         }
         
+        @media (max-width: 768px) {
+            .food-database {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .food-search {
             background: #f9f9f9;
             padding: 20px;
@@ -368,13 +400,20 @@
             max-height: 300px;
             overflow-y: auto;
             margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
         }
         
         .food-item {
-            padding: 10px;
+            padding: 10px 15px;
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        
+        .food-item:last-child {
+            border-bottom: none;
         }
         
         .food-tracker {
@@ -385,13 +424,22 @@
         
         .tracked-foods {
             margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
         }
         
         .tracked-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 10px 15px;
             border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .tracked-item:last-child {
+            border-bottom: none;
         }
         
         /* Water Tracker */
@@ -401,10 +449,15 @@
         }
         
         #water-counter {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
             color: var(--secondary);
             margin: 20px 0;
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 200px;
         }
         
         .water-buttons {
@@ -412,21 +465,30 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 20px;
         }
         
         .water-buttons button {
             padding: 12px 20px;
+            min-width: 100px;
         }
         
         .water-history {
             margin-top: 20px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
         }
         
         .water-entry {
             display: flex;
             justify-content: space-between;
-            padding: 8px;
+            padding: 10px 15px;
             border-bottom: 1px solid #eee;
+        }
+        
+        .water-entry:last-child {
+            border-bottom: none;
         }
         
         /* PWA Installation */
@@ -467,19 +529,6 @@
                 width: 100%;
             }
             
-            .recipe-detail {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content {
-                margin: 20px 10px;
-            }
-            
-            .charts-container,
-            .food-database {
-                grid-template-columns: 1fr;
-            }
-            
             .tabs {
                 flex-direction: column;
                 align-items: center;
@@ -505,186 +554,214 @@
         .hidden {
             display: none;
         }
+        
+        .macro-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .macro-card {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .macro-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+        
+        .macro-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
-        <p class="tagline">Το πιο ολοκληρωμένο εργαλείο για την κετογονική διατροφή</p>
-        <div class="premium-badge">FULL VERSION</div>
-    </header>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
+            <p class="tagline">Your complete ketogenic diet planning tool</p>
+            <div class="premium-badge">FULL VERSION</div>
+        </header>
 
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="calculator">Keto Calculator</button>
-        <button class="tab-btn" data-tab="recipes">Συνταγές</button>
-        <button class="tab-btn" data-tab="progress">Πρόοδος</button>
-        <button class="tab-btn" data-tab="food">Τροφές</button>
-        <button class="tab-btn" data-tab="water">Υγρομετρημός</button>
-    </div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="calculator">Keto Calculator</button>
+            <button class="tab-btn" data-tab="recipes">Recipe Generator</button>
+            <button class="tab-btn" data-tab="progress">Progress Analytics</button>
+            <button class="tab-btn" data-tab="food">Food Tracker</button>
+            <button class="tab-btn" data-tab="water">Water Tracker</button>
+        </div>
 
-    <main>
-        <!-- Keto Calculator Section -->
-        <section id="calculator" class="section active">
-            <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
-            <div class="input-group">
-                <input type="number" id="weight" placeholder="Βάρος (kg)" value="80" />
-                <input type="number" id="height" placeholder="Ύψος (cm)" value="175" />
-            </div>
-            <div class="input-group">
-                <input type="number" id="age" placeholder="Ηλικία" value="35" />
-                <select id="gender">
-                    <option value="male">Αρσενικό</option>
-                    <option value="female">Θηλυκό</option>
-                </select>
-                <select id="activity">
-                    <option value="1.2">Χαμηλή δραστηριότητα</option>
-                    <option value="1.375">Ελαφριά δραστηριότητα</option>
-                    <option value="1.55">Μέτρια δραστηριότητα</option>
-                    <option value="1.725">Υψηλή δραστηριότητα</option>
-                    <option value="1.9">Πολύ υψηλή δραστηριότητα</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <select id="goal">
-                    <option value="loss">Απώλεια βάρους</option>
-                    <option value="maintain">Διατήρηση βάρους</option>
-                    <option value="gain">Αύξηση βάρους</option>
-                </select>
-                <button onclick="calculateKeto()">
-                    <i class="fas fa-calculator"></i> Υπολογισμός Μακροθρεπτικών
-                </button>
-            </div>
-            <div id="keto-results" style="margin-top: 20px;"></div>
-        </section>
-
-        <!-- Recipe Generator Section -->
-        <section id="recipes" class="section">
-            <h2><i class="fas fa-utensils"></i> Recipe Generator από Συστατικά</h2>
-            <div class="input-group">
-                <input type="text" id="ingredients" placeholder="Εισάγετε συστατικά (π.χ. αυγά, μπέικον, λάχανο)" />
-                <button onclick="generateRecipes()" class="secondary">
-                    <i class="fas fa-search"></i> Αναζήτηση
-                </button>
-            </div>
-            
-            <div id="recipes-container" class="recipes-grid"></div>
-            
-            <!-- Recipe Detail Modal -->
-            <div id="recipe-modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="modal-title">Συνταγή</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="modal-body" id="modal-body">
-                        <!-- Recipe details will be loaded here -->
-                    </div>
+        <main>
+            <!-- Keto Calculator Section -->
+            <section id="calculator" class="section active">
+                <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
+                <div class="input-group">
+                    <input type="number" id="weight" placeholder="Weight (kg)" value="80" />
+                    <input type="number" id="height" placeholder="Height (cm)" value="175" />
                 </div>
-            </div>
-        </section>
+                <div class="input-group">
+                    <input type="number" id="age" placeholder="Age" value="35" />
+                    <select id="gender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    <select id="activity">
+                        <option value="1.2">Sedentary</option>
+                        <option value="1.375">Lightly Active</option>
+                        <option value="1.55">Moderately Active</option>
+                        <option value="1.725">Very Active</option>
+                        <option value="1.9">Extremely Active</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <select id="goal">
+                        <option value="loss">Weight Loss</option>
+                        <option value="maintain">Weight Maintenance</option>
+                        <option value="gain">Weight Gain</option>
+                    </select>
+                    <button onclick="calculateKeto()">
+                        <i class="fas fa-calculator"></i> Calculate Macros
+                    </button>
+                </div>
+                <div id="keto-results"></div>
+            </section>
 
-        <!-- Progress Analytics Section -->
-        <section id="progress" class="section">
-            <h2><i class="fas fa-chart-line"></i> Ανάλυση Προόδου</h2>
-            <div class="input-group">
-                <input type="number" id="weight-input" placeholder="Βάρος (kg)" />
-                <input type="number" id="bodyfat-input" placeholder="Ποσοστό Σωματικού Λίπους (%)" />
-                <button onclick="addProgressEntry()">
-                    <i class="fas fa-save"></i> Καταχώρηση
-                </button>
-            </div>
-            
-            <div class="charts-container">
-                <div class="chart-box">
-                    <h3><i class="fas fa-weight-scale"></i> Πρόοδος Απώλειας Βάρους</h3>
-                    <canvas id="weight-chart" height="250"></canvas>
+            <!-- Recipe Generator Section -->
+            <section id="recipes" class="section">
+                <h2><i class="fas fa-utensils"></i> Recipe Generator</h2>
+                <div class="input-group">
+                    <input type="text" id="ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
+                    <button onclick="generateRecipes()" class="secondary">
+                        <i class="fas fa-search"></i> Search Recipes
+                    </button>
                 </div>
                 
-                <div class="chart-box">
-                    <h3><i class="fas fa-percent"></i> Ποσοστό Σωματικού Λίπους</h3>
-                    <canvas id="bodyfat-chart" height="250"></canvas>
+                <div id="recipes-container" class="recipes-grid"></div>
+                
+                <!-- Recipe Detail Modal -->
+                <div id="recipe-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-title">Recipe Details</h3>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <div class="modal-body" id="modal-body">
+                            <!-- Recipe details will be loaded here -->
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Food Tracker Section -->
-        <section id="food" class="section">
-            <h2><i class="fas fa-apple-alt"></i> Παρακολούθηση Τροφής</h2>
-            
-            <div class="food-database">
-                <div class="food-search">
-                    <h3><i class="fas fa-database"></i> Βάση Δεδομένων Τροφών</h3>
-                    <div class="input-group">
-                        <input type="text" id="food-search" placeholder="Αναζήτηση τροφής..." />
-                        <button onclick="searchFood()" class="secondary">
-                            <i class="fas fa-search"></i> Αναζήτηση
-                        </button>
+            <!-- Progress Analytics Section -->
+            <section id="progress" class="section">
+                <h2><i class="fas fa-chart-line"></i> Progress Analytics</h2>
+                <div class="input-group">
+                    <input type="number" id="weight-input" placeholder="Weight (kg)" />
+                    <input type="number" id="bodyfat-input" placeholder="Body Fat (%)" />
+                    <button onclick="addProgressEntry()">
+                        <i class="fas fa-save"></i> Save Entry
+                    </button>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3><i class="fas fa-weight-scale"></i> Weight Progress</h3>
+                        <canvas id="weight-chart" height="250"></canvas>
                     </div>
                     
-                    <div class="food-list" id="food-list">
-                        <!-- Food items will be loaded here -->
+                    <div class="chart-box">
+                        <h3><i class="fas fa-percent"></i> Body Fat Percentage</h3>
+                        <canvas id="bodyfat-chart" height="250"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Food Tracker Section -->
+            <section id="food" class="section">
+                <h2><i class="fas fa-apple-alt"></i> Food Tracker & Database</h2>
+                
+                <div class="food-database">
+                    <div class="food-search">
+                        <h3><i class="fas fa-database"></i> Food Database</h3>
+                        <div class="input-group">
+                            <input type="text" id="food-search" placeholder="Search food..." />
+                            <button onclick="searchFood()" class="secondary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        
+                        <div class="food-list" id="food-list">
+                            <!-- Food items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="food-tracker">
+                        <h3><i class="fas fa-utensils"></i> Tracked Foods</h3>
+                        <div class="input-group">
+                            <select id="meal-type">
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                        </div>
+                        
+                        <div class="tracked-foods" id="tracked-foods">
+                            <!-- Tracked foods will be displayed here -->
+                        </div>
+                        
+                        <div class="input-group">
+                            <button onclick="saveFoodIntake()">
+                                <i class="fas fa-save"></i> Save Food Intake
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Water Tracker Section -->
+            <section id="water" class="section">
+                <h2><i class="fas fa-tint"></i> Water Tracker</h2>
+                <div class="water-container">
+                    <div id="water-counter">0ml</div>
+                    <div class="water-buttons">
+                        <button onclick="addWater(250)">+250ml</button>
+                        <button onclick="addWater(500)">+500ml</button>
+                        <button onclick="removeWater(250)" class="warning">-250ml</button>
+                        <button onclick="resetWater()" class="danger">Reset</button>
                     </div>
                 </div>
                 
-                <div class="food-tracker">
-                    <h3><i class="fas fa-utensils"></i> Καταγεγραμμένη Τροφή</h3>
-                    <div class="input-group">
-                        <select id="meal-type">
-                            <option value="breakfast">Πρωινό</option>
-                            <option value="lunch">Μεσημεριανό</option>
-                            <option value="dinner">Βραδινό</option>
-                            <option value="snack">Σνακ</option>
-                        </select>
-                    </div>
-                    
-                    <div class="tracked-foods" id="tracked-foods">
-                        <!-- Tracked foods will be displayed here -->
-                    </div>
-                    
-                    <div class="input-group">
-                        <button onclick="saveFoodIntake()">
-                            <i class="fas fa-save"></i> Αποθήκευση
-                        </button>
+                <div class="water-history">
+                    <h3><i class="fas fa-history"></i> Water Intake History</h3>
+                    <div id="water-history">
+                        <!-- Water history will be displayed here -->
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-        <!-- Water Tracker Section -->
-        <section id="water" class="section">
-            <h2><i class="fas fa-tint"></i> Παρακολούθηση Υδροποσίας</h2>
-            <div class="water-container">
-                <div id="water-counter">0ml</div>
-                <div class="water-buttons">
-                    <button onclick="addWater(250)">+250ml</button>
-                    <button onclick="addWater(500)">+500ml</button>
-                    <button onclick="removeWater(250)">-250ml</button>
-                    <button onclick="resetWater()" class="danger">Επαναφορά</button>
-                </div>
-            </div>
-            
-            <div class="water-history">
-                <h3><i class="fas fa-history"></i> Ιστορικό Υδροποσίας</h3>
-                <div id="water-history">
-                    <!-- Water history will be displayed here -->
-                </div>
-            </div>
-        </section>
-    </main>
+        <!-- PWA Installation -->
+        <div id="install-container">
+            <h3><i class="fas fa-mobile-alt"></i> Install Our Application</h3>
+            <p>Access your keto plan anytime, even offline</p>
+            <button id="install-button">
+                <i class="fas fa-download"></i> Install
+            </button>
+            <p id="install-status">For full experience, install the app on your device</p>
+        </div>
 
-    <!-- PWA Installation -->
-    <div id="install-container">
-        <h3><i class="fas fa-mobile-alt"></i> Εγκαταστήστε την εφαρμογή</h3>
-        <p>Πρόσβαση στο keto πλάνο σας οπουδήποτε, ακόμα και offline</p>
-        <button id="install-button">
-            <i class="fas fa-download"></i> Εγκατάσταση
-        </button>
-        <p id="install-status"></p>
+        <footer>
+            <p>&copy; 2023 Keto Macro Calculator | Made with <i class="fas fa-heart" style="color:#e74c3c"></i></p>
+        </footer>
     </div>
-
-    <footer>
-        <p>&copy; 2023 Keto Macro Calculator | Δημιουργήθηκε με <i class="fas fa-heart" style="color:#e74c3c"></i></p>
-    </footer>
 
     <script>
         // Tab navigation
@@ -708,7 +785,10 @@
         
         async function generateRecipes() {
             const ingredients = document.getElementById('ingredients').value;
-            if (!ingredients) return;
+            if (!ingredients) {
+                alert("Please enter ingredients to search for recipes");
+                return;
+            }
             
             const recipesContainer = document.getElementById('recipes-container');
             recipesContainer.innerHTML = '<div class="loader"></div>';
@@ -722,7 +802,7 @@
                 recipesContainer.innerHTML = '';
                 
                 if (recipes.length === 0) {
-                    recipesContainer.innerHTML = '<p>Δεν βρέθηκαν συνταγές. Δοκιμάστε διαφορετικά συστατικά.</p>';
+                    recipesContainer.innerHTML = '<p>No recipes found. Try different ingredients.</p>';
                     return;
                 }
                 
@@ -732,7 +812,7 @@
                             <img src="${recipe.image}" alt="${recipe.title}">
                             <h3>${recipe.title}</h3>
                             <div class="recipe-meta">
-                                <span>Χρησιμοποιεί: ${recipe.usedIngredientCount} συστατικά</span>
+                                <span>Uses: ${recipe.usedIngredientCount} ingredients</span>
                             </div>
                         </div>
                     `;
@@ -740,12 +820,12 @@
                 });
             } catch (error) {
                 console.error('Error fetching recipes:', error);
-                recipesContainer.innerHTML = '<p>Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.</p>';
+                recipesContainer.innerHTML = '<p>Error fetching recipes. Please try again later.</p>';
             }
         }
         
         async function showRecipeDetails(recipeId) {
-            document.getElementById('modal-title').textContent = "Φόρτωση...";
+            document.getElementById('modal-title').textContent = "Loading...";
             document.getElementById('modal-body').innerHTML = '<div class="loader"></div>';
             document.getElementById('recipe-modal').style.display = 'block';
             
@@ -767,9 +847,9 @@
                 if (recipe.instructions) {
                     instructionsHTML = recipe.instructions;
                 } else if (recipe.sourceUrl) {
-                    instructionsHTML = `<p>Δείτε τις οδηγίες στην αρχική σελίδα: <a href="${recipe.sourceUrl}" target="_blank">${recipe.sourceUrl}</a></p>`;
+                    instructionsHTML = `<p>See instructions on the original page: <a href="${recipe.sourceUrl}" target="_blank">${recipe.sourceUrl}</a></p>`;
                 } else {
-                    instructionsHTML = '<p>Δεν υπάρχουν διαθέσιμες οδηγίες για αυτή τη συνταγή.</p>';
+                    instructionsHTML = '<p>No instructions available for this recipe.</p>';
                 }
                 
                 document.getElementById('modal-body').innerHTML = `
@@ -777,19 +857,19 @@
                         <div>
                             <img src="${recipe.image}" alt="${recipe.title}">
                             <div class="recipe-meta" style="margin-top: 15px; justify-content: center;">
-                                <span><i class="fas fa-clock"></i> ${recipe.readyInMinutes} λεπτά</span>
+                                <span><i class="fas fa-clock"></i> ${recipe.readyInMinutes} min</span>
                                 <span style="margin: 0 15px;">|</span>
-                                <span><i class="fas fa-utensils"></i> ${recipe.servings} μερίδες</span>
+                                <span><i class="fas fa-utensils"></i> ${recipe.servings} servings</span>
                             </div>
                         </div>
                         <div>
                             <div class="ingredients">
-                                <h4><i class="fas fa-shopping-basket"></i> Υλικά</h4>
+                                <h4><i class="fas fa-shopping-basket"></i> Ingredients</h4>
                                 ${ingredientsHTML}
                             </div>
                             
                             <div class="instructions">
-                                <h4><i class="fas fa-list-ol"></i> Εκτέλεση</h4>
+                                <h4><i class="fas fa-list-ol"></i> Instructions</h4>
                                 <div>${instructionsHTML}</div>
                             </div>
                         </div>
@@ -797,7 +877,7 @@
                 `;
             } catch (error) {
                 console.error('Error fetching recipe details:', error);
-                document.getElementById('modal-body').innerHTML = '<p>Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.</p>';
+                document.getElementById('modal-body').innerHTML = '<p>Error loading recipe details. Please try again later.</p>';
             }
         }
         
@@ -816,7 +896,7 @@
             data: {
                 labels: dates,
                 datasets: [{
-                    label: 'Βάρος (kg)',
+                    label: 'Weight (kg)',
                     data: weightData,
                     borderColor: '#4caf50',
                     backgroundColor: 'rgba(76, 175, 80, 0.1)',
@@ -839,7 +919,7 @@
             data: {
                 labels: dates,
                 datasets: [{
-                    label: 'Ποσοστό Σωματικού Λίπους (%)',
+                    label: 'Body Fat (%)',
                     data: bodyfatData,
                     borderColor: '#2196F3',
                     backgroundColor: 'rgba(33, 150, 243, 0.1)',
@@ -862,7 +942,7 @@
             const bodyfat = parseFloat(document.getElementById('bodyfat-input').value);
             
             if (!weight || !bodyfat) {
-                alert("Παρακαλώ συμπληρώστε και τα δύο πεδία");
+                alert("Please fill in both fields");
                 return;
             }
             
@@ -882,21 +962,21 @@
             document.getElementById('weight-input').value = '';
             document.getElementById('bodyfat-input').value = '';
             
-            alert("Τα δεδομένα προόδου αποθηκεύτηκαν επιτυχώς!");
+            alert("Progress data saved successfully!");
         }
         
         // Food Tracker
         const foodDatabase = [
-            { id: 1, name: "Αυγό", calories: 70, protein: 6, fat: 5, carbs: 0.6 },
-            { id: 2, name: "Μπέικον", calories: 42, protein: 3, fat: 3.3, carbs: 0.1 },
-            { id: 3, name: "Αβοκάντο", calories: 160, protein: 2, fat: 15, carbs: 9 },
-            { id: 4, name: "Κοτόπουλο (100g)", calories: 165, protein: 31, fat: 3.6, carbs: 0 },
-            { id: 5, name: "Σολομός (100g)", calories: 208, protein: 20, fat: 13, carbs: 0 },
-            { id: 6, name: "Λάχανο", calories: 25, protein: 1.3, fat: 0.1, carbs: 6 },
-            { id: 7, name: "Σπανάκι", calories: 23, protein: 2.9, fat: 0.4, carbs: 3.6 },
-            { id: 8, name: "Μπρόκολο", calories: 34, protein: 2.8, fat: 0.4, carbs: 7 },
-            { id: 9, name: "Παρμεζάνα (30g)", calories: 122, protein: 11, fat: 8, carbs: 0.4 },
-            { id: 10, name: "Αμυγδαλόβουτυρο (1 κ.σ.)", calories: 98, protein: 3.4, fat: 9, carbs: 3 }
+            { id: 1, name: "Egg", calories: 70, protein: 6, fat: 5, carbs: 0.6 },
+            { id: 2, name: "Bacon", calories: 42, protein: 3, fat: 3.3, carbs: 0.1 },
+            { id: 3, name: "Avocado", calories: 160, protein: 2, fat: 15, carbs: 9 },
+            { id: 4, name: "Chicken (100g)", calories: 165, protein: 31, fat: 3.6, carbs: 0 },
+            { id: 5, name: "Salmon (100g)", calories: 208, protein: 20, fat: 13, carbs: 0 },
+            { id: 6, name: "Cabbage", calories: 25, protein: 1.3, fat: 0.1, carbs: 6 },
+            { id: 7, name: "Spinach", calories: 23, protein: 2.9, fat: 0.4, carbs: 3.6 },
+            { id: 8, name: "Broccoli", calories: 34, protein: 2.8, fat: 0.4, carbs: 7 },
+            { id: 9, name: "Parmesan (30g)", calories: 122, protein: 11, fat: 8, carbs: 0.4 },
+            { id: 10, name: "Almond Butter (1 tbsp)", calories: 98, protein: 3.4, fat: 9, carbs: 3 }
         ];
         
         let trackedFoods = [];
@@ -918,7 +998,7 @@
             );
             
             if (filteredFoods.length === 0) {
-                foodList.innerHTML = '<p>Δεν βρέθηκαν τροφές</p>';
+                foodList.innerHTML = '<p>No foods found</p>';
                 return;
             }
             
@@ -933,7 +1013,8 @@
             foodItem.className = 'food-item';
             foodItem.innerHTML = `
                 <div>${food.name}</div>
-                <button onclick="trackFood(${food.id})">Προσθήκη</button>
+                <div>${food.calories} cal</div>
+                <button onclick="trackFood(${food.id})">Add</button>
             `;
             foodList.appendChild(foodItem);
         }
@@ -951,7 +1032,7 @@
             trackedContainer.innerHTML = '';
             
             if (trackedFoods.length === 0) {
-                trackedContainer.innerHTML = '<p>Δεν έχετε προσθέσει τροφές ακόμα</p>';
+                trackedContainer.innerHTML = '<p>No foods tracked yet</p>';
                 return;
             }
             
@@ -960,7 +1041,7 @@
                 foodItem.className = 'tracked-item';
                 foodItem.innerHTML = `
                     <div>${food.name}</div>
-                    <div>${food.calories} θερμίδες</div>
+                    <div>${food.calories} cal</div>
                     <button class="danger" onclick="removeTrackedFood(${index})">
                         <i class="fas fa-times"></i>
                     </button>
@@ -976,24 +1057,14 @@
         
         function saveFoodIntake() {
             if (trackedFoods.length === 0) {
-                alert("Δεν έχετε προσθέσει τροφές για αποθήκευση");
+                alert("You haven't added any foods to save");
                 return;
             }
             
             const mealType = document.getElementById('meal-type').value;
-            alert(`Οι τροφές αποθηκεύτηκαν ως ${getMealName(mealType)}!`);
+            alert(`Foods saved as ${mealType}!`);
             trackedFoods = [];
             updateTrackedFoods();
-        }
-        
-        function getMealName(mealType) {
-            switch(mealType) {
-                case 'breakfast': return 'Πρωινό';
-                case 'lunch': return 'Μεσημεριανό';
-                case 'dinner': return 'Βραδινό';
-                case 'snack': return 'Σνακ';
-                default: return 'Γεύμα';
-            }
         }
         
         // Water Tracker
@@ -1058,7 +1129,7 @@
             historyContainer.innerHTML = '';
             
             if (waterHistory.length === 0) {
-                historyContainer.innerHTML = '<p>Δεν υπάρχει ιστορικό ακόμα</p>';
+                historyContainer.innerHTML = '<p>No history yet</p>';
                 return;
             }
             
@@ -1071,7 +1142,7 @@
                 
                 let amountText = '';
                 if (entry.amount === 'RESET') {
-                    amountText = 'Επαναφορά';
+                    amountText = 'Reset';
                 } else if (entry.amount > 0) {
                     amountText = `+${entry.amount}ml`;
                 } else {
@@ -1081,7 +1152,7 @@
                 entryElement.innerHTML = `
                     <div>${entry.time}</div>
                     <div><strong>${amountText}</strong></div>
-                    <div>Σύνολο: ${entry.total}ml</div>
+                    <div>Total: ${entry.total}ml</div>
                 `;
                 historyContainer.appendChild(entryElement);
             });
@@ -1097,7 +1168,7 @@
             const goal = document.getElementById('goal').value;
             
             if (!weight || !height || !age) {
-                alert("Παρακαλώ συμπληρώστε όλα τα πεδία");
+                alert("Please fill in all fields");
                 return;
             }
             
@@ -1128,30 +1199,28 @@
             const carbs = (0.05 * calories) / 4; // 5% of calories from carbs
             
             document.getElementById('keto-results').innerHTML = `
-                <div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; color: #2e7d32;">Τα Μακροθρεπτικά σας</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                        <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(calories)}</div>
-                            <div style="color: #666;">Θερμίδες</div>
-                        </div>
-                        <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(carbs)}g</div>
-                            <div style="color: #666;">Υδατάνθρακες</div>
-                        </div>
-                        <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(protein)}g</div>
-                            <div style="color: #666;">Πρωτεΐνες</div>
-                        </div>
-                        <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(fat)}g</div>
-                            <div style="color: #666;">Λίπη</div>
-                        </div>
+                <div class="macro-results">
+                    <div class="macro-card">
+                        <div class="macro-value">${Math.round(calories)}</div>
+                        <div class="macro-label">Calories</div>
                     </div>
-                    <div style="margin-top: 20px; text-align: center;">
-                        <p>Βάσει: ${gender === 'male' ? 'Αρσενικό' : 'Θηλυκό'}, ${age} ετών, ${weight}kg, ${height}cm</p>
-                        <p>Στόχος: ${goal === 'loss' ? 'Απώλεια βάρους' : goal === 'gain' ? 'Αύξηση βάρους' : 'Διατήρηση βάρους'}</p>
+                    <div class="macro-card">
+                        <div class="macro-value">${Math.round(carbs)}g</div>
+                        <div class="macro-label">Carbs</div>
                     </div>
+                    <div class="macro-card">
+                        <div class="macro-value">${Math.round(protein)}g</div>
+                        <div class="macro-label">Protein</div>
+                    </div>
+                    <div class="macro-card">
+                        <div class="macro-value">${Math.round(fat)}g</div>
+                        <div class="macro-label">Fat</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <p>Based on: ${gender}, ${age} years, ${weight}kg, ${height}cm</p>
+                    <p>Activity: ${document.getElementById('activity').options[document.getElementById('activity').selectedIndex].text}</p>
+                    <p>Goal: ${document.getElementById('goal').options[document.getElementById('goal').selectedIndex].text}</p>
                 </div>
             `;
         }
@@ -1172,7 +1241,7 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    installStatus.innerHTML = '<i class="fas fa-check-circle"></i> Η εφαρμογή εγκαταστάθηκε επιτυχώς!';
+                    installStatus.innerHTML = '<i class="fas fa-check-circle"></i> App installed successfully!';
                     installButton.style.display = 'none';
                     
                     // Create a download link
@@ -1184,17 +1253,17 @@
                     downloadLink.click();
                     document.body.removeChild(downloadLink);
                 } else {
-                    installStatus.textContent = 'Η εγκατάσταση ακυρώθηκε.';
+                    installStatus.textContent = 'Installation canceled.';
                 }
                 deferredPrompt = null;
             } else {
-                installStatus.textContent = 'Η εφαρμογή είναι ήδη εγκατεστημένη.';
+                installStatus.textContent = 'App is already installed.';
             }
         });
         
         // Check if app is already installed
         window.addEventListener('appinstalled', () => {
-            installStatus.innerHTML = '<i class="fas fa-check-circle"></i> Η εφαρμογή είναι ήδη εγκατεστημένη!';
+            installStatus.innerHTML = '<i class="fas fa-check-circle"></i> App is already installed!';
             installButton.style.display = 'none';
         });
 
@@ -1216,7 +1285,7 @@
             
             // Show install message
             if (!deferredPrompt) {
-                installStatus.innerHTML = 'Για πλήρη εμπειρία, εγκαταστήστε την εφαρμογή στον υπολογιστή ή κινητό σας.';
+                installStatus.innerHTML = 'For full experience, install the app on your device.';
             }
         };
     </script>
