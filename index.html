@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keto Macro Calculator</title>
+    <meta name="description" content="Keto Macro Calculator - Προσωποποιημένο πλάνο διατροφής">
+    <meta name="theme-color" content="#317EFB">
+    <title>Keto Macro Calculator - Full Version</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         :root {
             --primary: #4CAF50;
             --secondary: #2196F3;
-            --premium: #FF9800;
             --dark: #2c3e50;
             --light: #f8f9fa;
-            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #2ecc71;
         }
         
         * {
@@ -26,15 +31,10 @@
             line-height: 1.6;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             color: #333;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        
-        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            min-height: 100vh;
         }
         
         header {
@@ -42,7 +42,7 @@
             padding: 20px 0;
             background: white;
             border-radius: 10px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
@@ -68,7 +68,6 @@
         .tagline {
             color: #666;
             font-size: 1.1rem;
-            margin-bottom: 15px;
         }
         
         .premium-badge {
@@ -78,39 +77,34 @@
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
+            margin-top: 10px;
             font-size: 0.9rem;
         }
         
-        .version-switcher {
+        .tabs {
             display: flex;
             justify-content: center;
-            margin: 15px 0;
-            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
-        .version-btn {
-            padding: 10px 20px;
+        .tab-btn {
+            padding: 12px 24px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            border: 2px solid transparent;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
         }
         
-        .demo-btn {
-            background: var(--secondary);
-            color: white;
-        }
-        
-        .full-btn {
+        .tab-btn.active {
             background: var(--primary);
             color: white;
-        }
-        
-        .version-btn.active {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         main {
@@ -124,9 +118,14 @@
             background: white;
             border-radius: 12px;
             padding: 25px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             transition: transform 0.3s, box-shadow 0.3s;
             border-top: 3px solid var(--primary);
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
         }
         
         .section:hover {
@@ -152,12 +151,14 @@
             display: flex;
             margin: 20px 0;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         input[type="text"], 
         input[type="number"],
         select {
             flex: 1;
+            min-width: 200px;
             padding: 14px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -199,13 +200,12 @@
             background: #0b7dda;
         }
         
-        button.premium {
-            background: linear-gradient(135deg, #FF9800, #FF5722);
+        button.danger {
+            background: var(--danger);
         }
         
-        button.premium:hover {
-            background: linear-gradient(135deg, #e68a00, #e64a19);
-            transform: scale(1.05);
+        button.danger:hover {
+            background: #c0392b;
         }
         
         /* Recipe Generator */
@@ -333,86 +333,100 @@
             line-height: 1.6;
         }
         
-        /* Demo Limitations */
-        .demo-limit {
-            background: #fff8e1;
-            border-left: 4px solid #FFC107;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .demo-limit i {
-            color: #FFC107;
-            font-size: 1.2rem;
-        }
-        
-        /* Upgrade Banner */
-        .upgrade-banner {
-            background: linear-gradient(135deg, #4CAF50, #2196F3);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 30px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .upgrade-banner::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,100 L0,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
-            background-size: cover;
-        }
-        
-        .upgrade-banner h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            position: relative;
-        }
-        
-        .upgrade-banner p {
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        
-        .features-grid {
+        /* Progress Analytics */
+        .charts-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            max-width: 800px;
-            margin: 25px auto;
-            position: relative;
         }
         
-        .feature-card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
+        .chart-box {
+            background: white;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .chart-box canvas {
+            width: 100% !important;
+        }
+        
+        /* Food Tracker */
+        .food-database {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .food-search {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .food-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .food-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .food-tracker {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .tracked-foods {
+            margin-top: 15px;
+        }
+        
+        .tracked-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* Water Tracker */
+        .water-container {
             text-align: center;
-            transition: transform 0.3s;
+            margin: 20px 0;
         }
         
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-card i {
+        #water-counter {
             font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #FFEB3B;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+        
+        .water-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .water-buttons button {
+            padding: 12px 20px;
+        }
+        
+        .water-history {
+            margin-top: 20px;
+        }
+        
+        .water-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
         }
         
         /* PWA Installation */
@@ -461,7 +475,12 @@
                 margin: 20px 10px;
             }
             
-            .version-switcher {
+            .charts-container,
+            .food-database {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
                 flex-direction: column;
                 align-items: center;
             }
@@ -483,515 +502,322 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Hidden class for version switching */
         .hidden {
             display: none;
-        }
-        
-        /* Water tracker */
-        .water-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        #water-counter {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--secondary);
-            margin: 20px 0;
-        }
-        
-        .water-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .water-buttons button {
-            padding: 12px 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
-            <p class="tagline">The most comprehensive tool for ketogenic diet planning</p>
-            <div class="premium-badge">PREMIUM EDITION</div>
-            
-            <div class="version-switcher">
-                <div class="version-btn demo-btn active" onclick="showDemo()">Demo Version</div>
-                <div class="version-btn full-btn" onclick="showFull()">Full Version</div>
-            </div>
-        </header>
+    <header>
+        <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
+        <p class="tagline">Το πιο ολοκληρωμένο εργαλείο για την κετογονική διατροφή</p>
+        <div class="premium-badge">FULL VERSION</div>
+    </header>
 
-        <!-- Demo Version Content -->
-        <div id="demo-content">
-            <main>
-                <!-- Recipe Generator with Modal -->
-                <section class="section">
-                    <h2><i class="fas fa-utensils"></i> Recipe Generator from Ingredients</h2>
-                    <div class="input-group">
-                        <input type="text" id="ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
-                        <button onclick="generateRecipes('demo')" class="secondary">
-                            <i class="fas fa-search"></i> Search
-                        </button>
-                    </div>
-                    
-                    <div class="demo-limit">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Demo version: Shows up to 3 recipes. Upgrade for unlimited recipes and full details.</span>
-                    </div>
-                    
-                    <div id="recipes-container" class="recipes-grid"></div>
-                    
-                    <!-- Recipe Detail Modal -->
-                    <div id="recipe-modal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3 id="modal-title">Recipe</h3>
-                                <button class="close-modal">&times;</button>
-                            </div>
-                            <div class="modal-body" id="modal-body">
-                                <!-- Recipe details will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Keto Calculator Section -->
-                <section class="section">
-                    <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
-                    <div class="input-group">
-                        <input type="number" id="weight" placeholder="Weight (kg)" />
-                        <input type="number" id="height" placeholder="Height (cm)" />
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="age" placeholder="Age" />
-                        <select id="gender">
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
-                    <button onclick="calculateKeto('demo')">
-                        <i class="fas fa-calculator"></i> Calculate Macros
-                    </button>
-                    <div id="keto-results" style="margin-top: 20px;"></div>
-                </section>
-
-                <!-- Weight Loss Progress -->
-                <section class="section">
-                    <h2><i class="fas fa-chart-line"></i> Weight Loss Progress</h2>
-                    <div class="input-group">
-                        <input type="number" id="weight-input" placeholder="Weight (kg)" />
-                        <button onclick="addWeightEntry('demo')">
-                            <i class="fas fa-save"></i> Save
-                        </button>
-                    </div>
-                    <canvas id="weight-chart" height="300"></canvas>
-                </section>
-
-                <!-- Water Tracker -->
-                <section class="section">
-                    <h2><i class="fas fa-tint"></i> Water Intake Tracker</h2>
-                    <div class="water-container">
-                        <div id="water-counter">0ml</div>
-                        <div class="water-buttons">
-                            <button onclick="addWater(250)">+250ml</button>
-                            <button onclick="addWater(500)">+500ml</button>
-                            <button onclick="resetWater()">Reset</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Upgrade Banner -->
-                <div class="upgrade-banner">
-                    <h3><i class="fas fa-crown"></i> Upgrade to Full Version</h3>
-                    <p>Unlock all features and get full access to the tool</p>
-                    
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <i class="fas fa-infinity"></i>
-                            <h4>Unlimited Recipes</h4>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-chart-pie"></i>
-                            <h4>Detailed Analytics</h4>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-cloud-download-alt"></i>
-                            <h4>Data Export</h4>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fas fa-bell"></i>
-                            <h4>Personal Reminders</h4>
-                        </div>
-                    </div>
-                    
-                    <a href="https://gadgeteer70.gumroad.com/l/keto" target="_blank">
-                        <button class="premium">
-                            <i class="fas fa-lock-open"></i> Upgrade Now - $9.99
-                        </button>
-                    </a>
-                    <p style="margin-top: 15px; opacity: 0.9;">30-day money-back guarantee</p>
-                </div>
-            </main>
-        </div>
-
-        <!-- Full Version Content -->
-        <div id="full-content" class="hidden">
-            <main>
-                <!-- Recipe Generator with Modal -->
-                <section class="section">
-                    <h2><i class="fas fa-utensils"></i> Recipe Generator from Ingredients</h2>
-                    <div class="input-group">
-                        <input type="text" id="full-ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
-                        <button onclick="generateRecipes('full')" class="secondary">
-                            <i class="fas fa-search"></i> Search
-                        </button>
-                    </div>
-                    
-                    <div id="full-recipes-container" class="recipes-grid"></div>
-                    
-                    <!-- Recipe Detail Modal -->
-                    <div id="full-recipe-modal" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3 id="full-modal-title">Recipe</h3>
-                                <button class="close-modal">&times;</button>
-                            </div>
-                            <div class="modal-body" id="full-modal-body">
-                                <!-- Recipe details will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Keto Calculator Section -->
-                <section class="section">
-                    <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
-                    <div class="input-group">
-                        <input type="number" id="full-weight" placeholder="Weight (kg)" />
-                        <input type="number" id="full-height" placeholder="Height (cm)" />
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="full-age" placeholder="Age" />
-                        <select id="full-gender">
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
-                    <button onclick="calculateKeto('full')">
-                        <i class="fas fa-calculator"></i> Calculate Macros
-                    </button>
-                    <div id="full-keto-results" style="margin-top: 20px;"></div>
-                </section>
-
-                <!-- Weight Loss Progress -->
-                <section class="section">
-                    <h2><i class="fas fa-chart-line"></i> Weight Loss Progress</h2>
-                    <div class="input-group">
-                        <input type="number" id="full-weight-input" placeholder="Weight (kg)" />
-                        <button onclick="addWeightEntry('full')">
-                            <i class="fas fa-save"></i> Save
-                        </button>
-                    </div>
-                    <canvas id="full-weight-chart" height="300"></canvas>
-                    <div id="full-weight-history" style="margin-top: 20px;"></div>
-                </section>
-
-                <!-- Water Tracker -->
-                <section class="section">
-                    <h2><i class="fas fa-tint"></i> Water Intake Tracker</h2>
-                    <div class="water-container">
-                        <div id="full-water-counter">0ml</div>
-                        <div class="water-buttons">
-                            <button onclick="addFullWater(250)">+250ml</button>
-                            <button onclick="addFullWater(500)">+500ml</button>
-                            <button onclick="resetFullWater()">Reset</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Meal Planner -->
-                <section class="section">
-                    <h2><i class="fas fa-calendar-alt"></i> Meal Planner</h2>
-                    <div id="meal-plan-container" class="recipes-grid"></div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="generateMealPlan()">
-                            <i class="fas fa-plus"></i> Generate Meal Plan
-                        </button>
-                    </div>
-                </section>
-            </main>
-        </div>
-
-        <!-- PWA Installation -->
-        <div id="install-container">
-            <h3><i class="fas fa-mobile-alt"></i> Install Our Application</h3>
-            <p>Access your keto plan anytime, even offline</p>
-            <button id="install-button">
-                <i class="fas fa-download"></i> Install
-            </button>
-            <p id="install-status">For full experience, install the app on your device</p>
-        </div>
-
-        <footer>
-            <p>&copy; 2023 Keto Macro Calculator | Made with <i class="fas fa-heart" style="color:#e74c3c"></i></p>
-        </footer>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="calculator">Keto Calculator</button>
+        <button class="tab-btn" data-tab="recipes">Συνταγές</button>
+        <button class="tab-btn" data-tab="progress">Πρόοδος</button>
+        <button class="tab-btn" data-tab="food">Τροφές</button>
+        <button class="tab-btn" data-tab="water">Υγρομετρημός</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Version control
-        function showDemo() {
-            document.getElementById('demo-content').classList.remove('hidden');
-            document.getElementById('full-content').classList.add('hidden');
-            document.querySelector('.demo-btn').classList.add('active');
-            document.querySelector('.full-btn').classList.remove('active');
-        }
-        
-        function showFull() {
-            document.getElementById('demo-content').classList.add('hidden');
-            document.getElementById('full-content').classList.remove('hidden');
-            document.querySelector('.demo-btn').classList.remove('active');
-            document.querySelector('.full-btn').classList.add('active');
-        }
-        
-        // Recipe Generator with Modal
-        const recipes = [
-            {
-                id: 1,
-                title: "Keto Omelette",
-                image: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 420,
-                time: 15,
-                ingredients: ["3 eggs", "100g bacon", "30g feta cheese", "1/2 avocado", "1 tbsp butter"],
-                instructions: [
-                    "Chop the bacon and fry it over medium heat until crispy.",
-                    "In a bowl, beat the eggs with salt and pepper.",
-                    "Add the eggs to the pan and cook for 2-3 minutes.",
-                    "Add cheese and sliced avocado.",
-                    "Fold the omelette and serve immediately."
-                ]
-            },
-            {
-                id: 2,
-                title: "Chicken Avocado Salad",
-                image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 380,
-                time: 20,
-                ingredients: ["200g chicken", "1 avocado", "100g cabbage", "1 onion", "2 tbsp olive oil", "lemon juice"],
-                instructions: [
-                    "Grill or bake the chicken until cooked through.",
-                    "Slice cabbage into thin strips, onion into rings, and avocado into cubes.",
-                    "In a bowl, mix all ingredients.",
-                    "Add olive oil, lemon juice, salt and pepper.",
-                    "Mix well and serve."
-                ]
-            },
-            {
-                id: 3,
-                title: "Cabbage Beef Patties",
-                image: "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 450,
-                time: 30,
-                ingredients: ["500g ground beef", "300g cabbage", "1 onion", "1 egg", "2 garlic cloves", "1 tbsp paprika"],
-                instructions: [
-                    "Finely chop cabbage, onion and garlic.",
-                    "In a bowl, mix ground beef with egg, vegetables and spices.",
-                    "Form patties and bake at 180°C for 20-25 minutes.",
-                    "Flip patties halfway through cooking.",
-                    "Serve with fresh cabbage and lemon dressing."
-                ]
-            },
-            {
-                id: 4,
-                title: "Salmon with Asparagus",
-                image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 480,
-                time: 25,
-                ingredients: ["2 salmon fillets", "200g asparagus", "1 lemon", "2 tbsp olive oil", "garlic powder", "dill"],
-                instructions: [
-                    "Preheat oven to 200°C.",
-                    "Place salmon and asparagus on baking sheet.",
-                    "Drizzle with olive oil and season.",
-                    "Bake for 15-18 minutes until salmon flakes easily.",
-                    "Serve with lemon wedges."
-                ]
-            },
-            {
-                id: 5,
-                title: "Keto Fat Bombs",
-                image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 150,
-                time: 15,
-                ingredients: ["1/2 cup coconut oil", "1/2 cup almond butter", "2 tbsp cocoa powder", "1/4 cup shredded coconut", "stevia to taste"],
-                instructions: [
-                    "Melt coconut oil and almond butter together.",
-                    "Mix in cocoa powder and sweetener.",
-                    "Pour into silicone molds.",
-                    "Sprinkle with shredded coconut.",
-                    "Freeze for 1 hour before serving."
-                ]
-            }
-        ];
+    <main>
+        <!-- Keto Calculator Section -->
+        <section id="calculator" class="section active">
+            <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
+            <div class="input-group">
+                <input type="number" id="weight" placeholder="Βάρος (kg)" value="80" />
+                <input type="number" id="height" placeholder="Ύψος (cm)" value="175" />
+            </div>
+            <div class="input-group">
+                <input type="number" id="age" placeholder="Ηλικία" value="35" />
+                <select id="gender">
+                    <option value="male">Αρσενικό</option>
+                    <option value="female">Θηλυκό</option>
+                </select>
+                <select id="activity">
+                    <option value="1.2">Χαμηλή δραστηριότητα</option>
+                    <option value="1.375">Ελαφριά δραστηριότητα</option>
+                    <option value="1.55">Μέτρια δραστηριότητα</option>
+                    <option value="1.725">Υψηλή δραστηριότητα</option>
+                    <option value="1.9">Πολύ υψηλή δραστηριότητα</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <select id="goal">
+                    <option value="loss">Απώλεια βάρους</option>
+                    <option value="maintain">Διατήρηση βάρους</option>
+                    <option value="gain">Αύξηση βάρους</option>
+                </select>
+                <button onclick="calculateKeto()">
+                    <i class="fas fa-calculator"></i> Υπολογισμός Μακροθρεπτικών
+                </button>
+            </div>
+            <div id="keto-results" style="margin-top: 20px;"></div>
+        </section>
 
-        const fullRecipes = [
-            ...recipes,
-            {
-                id: 6,
-                title: "Zucchini Noodles with Pesto",
-                image: "https://images.unsplash.com/photo-1590005024862-6b67679a29fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 320,
-                time: 25,
-                ingredients: ["2 large zucchinis", "1/2 cup basil pesto", "1/4 cup pine nuts", "1/4 cup grated parmesan", "2 tbsp olive oil"],
-                instructions: [
-                    "Spiralize zucchinis into noodles.",
-                    "Heat olive oil in a pan over medium heat.",
-                    "Add zucchini noodles and sauté for 3-4 minutes.",
-                    "Remove from heat and mix in pesto.",
-                    "Top with pine nuts and parmesan before serving."
-                ]
-            },
-            {
-                id: 7,
-                title: "Cauliflower Pizza",
-                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                calories: 380,
-                time: 40,
-                ingredients: ["1 head cauliflower", "1 egg", "1 cup shredded mozzarella", "1/2 cup tomato sauce", "toppings of choice"],
-                instructions: [
-                    "Preheat oven to 200°C.",
-                    "Rice cauliflower and microwave for 5 minutes.",
-                    "Mix cauliflower with egg and mozzarella.",
-                    "Form into pizza crust and bake for 20 minutes.",
-                    "Add sauce and toppings, bake for additional 10 minutes."
-                ]
-            }
-        ];
+        <!-- Recipe Generator Section -->
+        <section id="recipes" class="section">
+            <h2><i class="fas fa-utensils"></i> Recipe Generator από Συστατικά</h2>
+            <div class="input-group">
+                <input type="text" id="ingredients" placeholder="Εισάγετε συστατικά (π.χ. αυγά, μπέικον, λάχανο)" />
+                <button onclick="generateRecipes()" class="secondary">
+                    <i class="fas fa-search"></i> Αναζήτηση
+                </button>
+            </div>
+            
+            <div id="recipes-container" class="recipes-grid"></div>
+            
+            <!-- Recipe Detail Modal -->
+            <div id="recipe-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Συνταγή</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="modal-body">
+                        <!-- Recipe details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        function generateRecipes(version) {
-            const ingredients = version === 'demo' 
-                ? document.getElementById('ingredients').value 
-                : document.getElementById('full-ingredients').value;
+        <!-- Progress Analytics Section -->
+        <section id="progress" class="section">
+            <h2><i class="fas fa-chart-line"></i> Ανάλυση Προόδου</h2>
+            <div class="input-group">
+                <input type="number" id="weight-input" placeholder="Βάρος (kg)" />
+                <input type="number" id="bodyfat-input" placeholder="Ποσοστό Σωματικού Λίπους (%)" />
+                <button onclick="addProgressEntry()">
+                    <i class="fas fa-save"></i> Καταχώρηση
+                </button>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3><i class="fas fa-weight-scale"></i> Πρόοδος Απώλειας Βάρους</h3>
+                    <canvas id="weight-chart" height="250"></canvas>
+                </div>
                 
+                <div class="chart-box">
+                    <h3><i class="fas fa-percent"></i> Ποσοστό Σωματικού Λίπους</h3>
+                    <canvas id="bodyfat-chart" height="250"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Food Tracker Section -->
+        <section id="food" class="section">
+            <h2><i class="fas fa-apple-alt"></i> Παρακολούθηση Τροφής</h2>
+            
+            <div class="food-database">
+                <div class="food-search">
+                    <h3><i class="fas fa-database"></i> Βάση Δεδομένων Τροφών</h3>
+                    <div class="input-group">
+                        <input type="text" id="food-search" placeholder="Αναζήτηση τροφής..." />
+                        <button onclick="searchFood()" class="secondary">
+                            <i class="fas fa-search"></i> Αναζήτηση
+                        </button>
+                    </div>
+                    
+                    <div class="food-list" id="food-list">
+                        <!-- Food items will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="food-tracker">
+                    <h3><i class="fas fa-utensils"></i> Καταγεγραμμένη Τροφή</h3>
+                    <div class="input-group">
+                        <select id="meal-type">
+                            <option value="breakfast">Πρωινό</option>
+                            <option value="lunch">Μεσημεριανό</option>
+                            <option value="dinner">Βραδινό</option>
+                            <option value="snack">Σνακ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="tracked-foods" id="tracked-foods">
+                        <!-- Tracked foods will be displayed here -->
+                    </div>
+                    
+                    <div class="input-group">
+                        <button onclick="saveFoodIntake()">
+                            <i class="fas fa-save"></i> Αποθήκευση
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Water Tracker Section -->
+        <section id="water" class="section">
+            <h2><i class="fas fa-tint"></i> Παρακολούθηση Υδροποσίας</h2>
+            <div class="water-container">
+                <div id="water-counter">0ml</div>
+                <div class="water-buttons">
+                    <button onclick="addWater(250)">+250ml</button>
+                    <button onclick="addWater(500)">+500ml</button>
+                    <button onclick="removeWater(250)">-250ml</button>
+                    <button onclick="resetWater()" class="danger">Επαναφορά</button>
+                </div>
+            </div>
+            
+            <div class="water-history">
+                <h3><i class="fas fa-history"></i> Ιστορικό Υδροποσίας</h3>
+                <div id="water-history">
+                    <!-- Water history will be displayed here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PWA Installation -->
+    <div id="install-container">
+        <h3><i class="fas fa-mobile-alt"></i> Εγκαταστήστε την εφαρμογή</h3>
+        <p>Πρόσβαση στο keto πλάνο σας οπουδήποτε, ακόμα και offline</p>
+        <button id="install-button">
+            <i class="fas fa-download"></i> Εγκατάσταση
+        </button>
+        <p id="install-status"></p>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Keto Macro Calculator | Δημιουργήθηκε με <i class="fas fa-heart" style="color:#e74c3c"></i></p>
+    </footer>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and sections
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Show corresponding section
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Recipe Generator with Spoonacular API
+        const SPOONACULAR_API_KEY = "9d6e284d0f1c4b2c8b7a9a3a2c7e3b0a"; // Replace with your actual API key
+        
+        async function generateRecipes() {
+            const ingredients = document.getElementById('ingredients').value;
             if (!ingredients) return;
             
-            const recipesContainer = version === 'demo' 
-                ? document.getElementById('recipes-container')
-                : document.getElementById('full-recipes-container');
-                
+            const recipesContainer = document.getElementById('recipes-container');
             recipesContainer.innerHTML = '<div class="loader"></div>';
             
-            // Simulate API call delay
-            setTimeout(() => {
+            try {
+                const response = await axios.get(
+                    `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&number=3&apiKey=${SPOONACULAR_API_KEY}`
+                );
+                
+                const recipes = response.data;
                 recipesContainer.innerHTML = '';
                 
-                // Demo limitation - only show 3 recipes
-                const showRecipes = version === 'demo' 
-                    ? recipes.slice(0, 3) 
-                    : fullRecipes;
+                if (recipes.length === 0) {
+                    recipesContainer.innerHTML = '<p>Δεν βρέθηκαν συνταγές. Δοκιμάστε διαφορετικά συστατικά.</p>';
+                    return;
+                }
                 
-                showRecipes.forEach(recipe => {
+                recipes.forEach(recipe => {
                     const recipeCard = `
-                        <div class="recipe-card" onclick="showRecipeDetail(${recipe.id}, '${version}')">
+                        <div class="recipe-card" onclick="showRecipeDetails(${recipe.id})">
                             <img src="${recipe.image}" alt="${recipe.title}">
                             <h3>${recipe.title}</h3>
                             <div class="recipe-meta">
-                                <span><i class="fas fa-fire"></i> ${recipe.calories} calories</span>
-                                <span><i class="fas fa-clock"></i> ${recipe.time} min</span>
+                                <span>Χρησιμοποιεί: ${recipe.usedIngredientCount} συστατικά</span>
                             </div>
                         </div>
                     `;
                     recipesContainer.innerHTML += recipeCard;
                 });
-            }, 1000);
+            } catch (error) {
+                console.error('Error fetching recipes:', error);
+                recipesContainer.innerHTML = '<p>Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.</p>';
+            }
         }
-
-        function showRecipeDetail(recipeId, version) {
-            const recipe = (version === 'demo' ? recipes : fullRecipes).find(r => r.id === recipeId);
-            if (!recipe) return;
+        
+        async function showRecipeDetails(recipeId) {
+            document.getElementById('modal-title').textContent = "Φόρτωση...";
+            document.getElementById('modal-body').innerHTML = '<div class="loader"></div>';
+            document.getElementById('recipe-modal').style.display = 'block';
             
-            const modalId = version === 'demo' ? 'recipe-modal' : 'full-recipe-modal';
-            const modalTitle = version === 'demo' ? 'modal-title' : 'full-modal-title';
-            const modalBody = version === 'demo' ? 'modal-body' : 'full-modal-body';
-            
-            document.getElementById(modalTitle).textContent = recipe.title;
-            
-            document.getElementById(modalBody).innerHTML = `
-                <div class="recipe-detail">
-                    <div>
-                        <img src="${recipe.image}" alt="${recipe.title}">
-                        <div class="recipe-meta" style="margin-top: 15px; justify-content: center;">
-                            <span><i class="fas fa-fire"></i> ${recipe.calories} calories</span>
-                            <span style="margin: 0 15px;">|</span>
-                            <span><i class="fas fa-clock"></i> ${recipe.time} min</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="ingredients">
-                            <h4><i class="fas fa-shopping-basket"></i> Ingredients</h4>
-                            <ul>
-                                ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="instructions">
-                            <h4><i class="fas fa-list-ol"></i> Instructions</h4>
-                            <ol>
-                                ${recipe.instructions.map(step => `<li>${step}</li>`).join('')}
-                            </ol>
-                        </div>
-                        
-                        ${version === 'demo' ? `
-                        <div class="demo-limit">
-                            <i class="fas fa-lock"></i>
-                            <span>Upgrade to access 500+ recipes and save functionality</span>
-                        </div>
-                        
-                        <div style="text-align: center; margin-top: 20px;">
-                            <a href="https://gadgeteer70.gumroad.com/l/keto" target="_blank">
-                                <button class="premium">
-                                    <i class="fas fa-crown"></i> Upgrade Now
-                                </button>
-                            </a>
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        // Close modal function
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.style.display = 'none';
+            try {
+                const response = await axios.get(
+                    `https://api.spoonacular.com/recipes/${recipeId}/information?includeNutrition=false&apiKey=${SPOONACULAR_API_KEY}`
+                );
+                
+                const recipe = response.data;
+                document.getElementById('modal-title').textContent = recipe.title;
+                
+                let ingredientsHTML = '<ul>';
+                recipe.extendedIngredients.forEach(ingredient => {
+                    ingredientsHTML += `<li>${ingredient.original}</li>`;
                 });
-            });
-        });
-
-        // Close modal if clicked outside
-        window.addEventListener('click', function(event) {
-            document.querySelectorAll('.modal').forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
+                ingredientsHTML += '</ul>';
+                
+                let instructionsHTML = '';
+                if (recipe.instructions) {
+                    instructionsHTML = recipe.instructions;
+                } else if (recipe.sourceUrl) {
+                    instructionsHTML = `<p>Δείτε τις οδηγίες στην αρχική σελίδα: <a href="${recipe.sourceUrl}" target="_blank">${recipe.sourceUrl}</a></p>`;
+                } else {
+                    instructionsHTML = '<p>Δεν υπάρχουν διαθέσιμες οδηγίες για αυτή τη συνταγή.</p>';
                 }
-            });
+                
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="recipe-detail">
+                        <div>
+                            <img src="${recipe.image}" alt="${recipe.title}">
+                            <div class="recipe-meta" style="margin-top: 15px; justify-content: center;">
+                                <span><i class="fas fa-clock"></i> ${recipe.readyInMinutes} λεπτά</span>
+                                <span style="margin: 0 15px;">|</span>
+                                <span><i class="fas fa-utensils"></i> ${recipe.servings} μερίδες</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="ingredients">
+                                <h4><i class="fas fa-shopping-basket"></i> Υλικά</h4>
+                                ${ingredientsHTML}
+                            </div>
+                            
+                            <div class="instructions">
+                                <h4><i class="fas fa-list-ol"></i> Εκτέλεση</h4>
+                                <div>${instructionsHTML}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching recipe details:', error);
+                document.getElementById('modal-body').innerHTML = '<p>Παρουσιάστηκε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.</p>';
+            }
+        }
+        
+        // Close modal function
+        document.querySelector('.close-modal').addEventListener('click', function() {
+            document.getElementById('recipe-modal').style.display = 'none';
         });
-
-        // Weight Loss Chart
+        
+        // Progress Analytics Charts
+        const weightData = [85, 83, 82, 81, 80, 79, 78];
+        const bodyfatData = [25, 24, 23, 22, 21, 20, 19];
+        const dates = ['1/6', '5/6', '10/6', '15/6', '20/6', '25/6', '30/6'];
+        
         const weightChart = new Chart(document.getElementById('weight-chart'), {
             type: 'line',
             data: {
-                labels: ['1/6', '5/6', '10/6', '15/6', '20/6', '25/6'],
+                labels: dates,
                 datasets: [{
-                    label: 'Weight (kg)',
-                    data: [85, 83, 82, 81, 80, 79],
+                    label: 'Βάρος (kg)',
+                    data: weightData,
                     borderColor: '#4caf50',
                     backgroundColor: 'rgba(76, 175, 80, 0.1)',
                     tension: 0.3,
@@ -1002,28 +828,21 @@
                 responsive: true,
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'Weight Loss Progress'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 75
+                        display: false
                     }
                 }
             }
         });
-
-        const fullWeightChart = new Chart(document.getElementById('full-weight-chart'), {
+        
+        const bodyfatChart = new Chart(document.getElementById('bodyfat-chart'), {
             type: 'line',
             data: {
-                labels: [],
+                labels: dates,
                 datasets: [{
-                    label: 'Weight (kg)',
-                    data: [],
-                    borderColor: '#4caf50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    label: 'Ποσοστό Σωματικού Λίπους (%)',
+                    data: bodyfatData,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
                     tension: 0.3,
                     fill: true
                 }]
@@ -1032,187 +851,311 @@
                 responsive: true,
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'Weight Loss Progress'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false
+                        display: false
                     }
                 }
             }
         });
-
-        function addWeightEntry(version) {
-            const weightInput = version === 'demo' 
-                ? document.getElementById('weight-input')
-                : document.getElementById('full-weight-input');
-                
-            const weight = parseFloat(weightInput.value);
-            if (!weight) return;
+        
+        function addProgressEntry() {
+            const weight = parseFloat(document.getElementById('weight-input').value);
+            const bodyfat = parseFloat(document.getElementById('bodyfat-input').value);
             
-            if (version === 'demo') {
-                alert(`Weight ${weight}kg recorded! Upgrade for full history and statistics.`);
-            } else {
-                const now = new Date();
-                const dateLabel = `${now.getDate()}/${now.getMonth() + 1}`;
-                
-                // Update chart
-                fullWeightChart.data.labels.push(dateLabel);
-                fullWeightChart.data.datasets[0].data.push(weight);
-                fullWeightChart.update();
-                
-                // Update history
-                updateWeightHistory();
-            }
-            
-            weightInput.value = '';
-        }
-
-        function updateWeightHistory() {
-            const historyContainer = document.getElementById('full-weight-history');
-            if (!historyContainer) return;
-            
-            if (fullWeightChart.data.labels.length === 0) {
-                historyContainer.innerHTML = '<p>No weight entries yet</p>';
+            if (!weight || !bodyfat) {
+                alert("Παρακαλώ συμπληρώστε και τα δύο πεδία");
                 return;
             }
             
-            let historyHTML = '<h3>Weight History:</h3><ul>';
-            fullWeightChart.data.labels.forEach((label, index) => {
-                historyHTML += `<li>${label}: ${fullWeightChart.data.datasets[0].data[index]}kg</li>`;
+            // Add to chart data
+            const now = new Date();
+            const dateLabel = `${now.getDate()}/${now.getMonth() + 1}`;
+            
+            weightChart.data.labels.push(dateLabel);
+            weightChart.data.datasets[0].data.push(weight);
+            weightChart.update();
+            
+            bodyfatChart.data.labels.push(dateLabel);
+            bodyfatChart.data.datasets[0].data.push(bodyfat);
+            bodyfatChart.update();
+            
+            // Clear inputs
+            document.getElementById('weight-input').value = '';
+            document.getElementById('bodyfat-input').value = '';
+            
+            alert("Τα δεδομένα προόδου αποθηκεύτηκαν επιτυχώς!");
+        }
+        
+        // Food Tracker
+        const foodDatabase = [
+            { id: 1, name: "Αυγό", calories: 70, protein: 6, fat: 5, carbs: 0.6 },
+            { id: 2, name: "Μπέικον", calories: 42, protein: 3, fat: 3.3, carbs: 0.1 },
+            { id: 3, name: "Αβοκάντο", calories: 160, protein: 2, fat: 15, carbs: 9 },
+            { id: 4, name: "Κοτόπουλο (100g)", calories: 165, protein: 31, fat: 3.6, carbs: 0 },
+            { id: 5, name: "Σολομός (100g)", calories: 208, protein: 20, fat: 13, carbs: 0 },
+            { id: 6, name: "Λάχανο", calories: 25, protein: 1.3, fat: 0.1, carbs: 6 },
+            { id: 7, name: "Σπανάκι", calories: 23, protein: 2.9, fat: 0.4, carbs: 3.6 },
+            { id: 8, name: "Μπρόκολο", calories: 34, protein: 2.8, fat: 0.4, carbs: 7 },
+            { id: 9, name: "Παρμεζάνα (30g)", calories: 122, protein: 11, fat: 8, carbs: 0.4 },
+            { id: 10, name: "Αμυγδαλόβουτυρο (1 κ.σ.)", calories: 98, protein: 3.4, fat: 9, carbs: 3 }
+        ];
+        
+        let trackedFoods = [];
+        
+        function searchFood() {
+            const searchTerm = document.getElementById('food-search').value.toLowerCase();
+            const foodList = document.getElementById('food-list');
+            foodList.innerHTML = '';
+            
+            if (!searchTerm) {
+                foodDatabase.forEach(food => {
+                    addFoodItem(food);
+                });
+                return;
+            }
+            
+            const filteredFoods = foodDatabase.filter(food => 
+                food.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredFoods.length === 0) {
+                foodList.innerHTML = '<p>Δεν βρέθηκαν τροφές</p>';
+                return;
+            }
+            
+            filteredFoods.forEach(food => {
+                addFoodItem(food);
             });
-            historyHTML += '</ul>';
-            historyContainer.innerHTML = historyHTML;
         }
-
+        
+        function addFoodItem(food) {
+            const foodList = document.getElementById('food-list');
+            const foodItem = document.createElement('div');
+            foodItem.className = 'food-item';
+            foodItem.innerHTML = `
+                <div>${food.name}</div>
+                <button onclick="trackFood(${food.id})">Προσθήκη</button>
+            `;
+            foodList.appendChild(foodItem);
+        }
+        
+        function trackFood(foodId) {
+            const food = foodDatabase.find(f => f.id === foodId);
+            if (!food) return;
+            
+            trackedFoods.push(food);
+            updateTrackedFoods();
+        }
+        
+        function updateTrackedFoods() {
+            const trackedContainer = document.getElementById('tracked-foods');
+            trackedContainer.innerHTML = '';
+            
+            if (trackedFoods.length === 0) {
+                trackedContainer.innerHTML = '<p>Δεν έχετε προσθέσει τροφές ακόμα</p>';
+                return;
+            }
+            
+            trackedFoods.forEach((food, index) => {
+                const foodItem = document.createElement('div');
+                foodItem.className = 'tracked-item';
+                foodItem.innerHTML = `
+                    <div>${food.name}</div>
+                    <div>${food.calories} θερμίδες</div>
+                    <button class="danger" onclick="removeTrackedFood(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                trackedContainer.appendChild(foodItem);
+            });
+        }
+        
+        function removeTrackedFood(index) {
+            trackedFoods.splice(index, 1);
+            updateTrackedFoods();
+        }
+        
+        function saveFoodIntake() {
+            if (trackedFoods.length === 0) {
+                alert("Δεν έχετε προσθέσει τροφές για αποθήκευση");
+                return;
+            }
+            
+            const mealType = document.getElementById('meal-type').value;
+            alert(`Οι τροφές αποθηκεύτηκαν ως ${getMealName(mealType)}!`);
+            trackedFoods = [];
+            updateTrackedFoods();
+        }
+        
+        function getMealName(mealType) {
+            switch(mealType) {
+                case 'breakfast': return 'Πρωινό';
+                case 'lunch': return 'Μεσημεριανό';
+                case 'dinner': return 'Βραδινό';
+                case 'snack': return 'Σνακ';
+                default: return 'Γεύμα';
+            }
+        }
+        
         // Water Tracker
+        let waterIntake = 0;
+        const waterHistory = [];
+        
         function addWater(amount) {
-            const waterCounter = document.getElementById('water-counter');
-            const current = parseInt(waterCounter.textContent) || 0;
-            const newTotal = current + amount;
-            waterCounter.textContent = `${newTotal}ml`;
+            waterIntake += amount;
+            updateWaterCounter();
+            
+            // Add to history
+            const now = new Date();
+            waterHistory.push({
+                time: now.toLocaleTimeString(),
+                amount: amount,
+                total: waterIntake
+            });
+            
+            updateWaterHistory();
         }
-
+        
+        function removeWater(amount) {
+            if (waterIntake - amount < 0) {
+                waterIntake = 0;
+            } else {
+                waterIntake -= amount;
+            }
+            updateWaterCounter();
+            
+            // Add removal to history
+            const now = new Date();
+            waterHistory.push({
+                time: now.toLocaleTimeString(),
+                amount: -amount,
+                total: waterIntake
+            });
+            
+            updateWaterHistory();
+        }
+        
         function resetWater() {
-            document.getElementById('water-counter').textContent = '0ml';
+            waterIntake = 0;
+            updateWaterCounter();
+            
+            // Add reset to history
+            const now = new Date();
+            waterHistory.push({
+                time: now.toLocaleTimeString(),
+                amount: 'RESET',
+                total: 0
+            });
+            
+            updateWaterHistory();
         }
-
-        function addFullWater(amount) {
-            const waterCounter = document.getElementById('full-water-counter');
-            const current = parseInt(waterCounter.textContent) || 0;
-            const newTotal = current + amount;
-            waterCounter.textContent = `${newTotal}ml`;
+        
+        function updateWaterCounter() {
+            document.getElementById('water-counter').textContent = `${waterIntake}ml`;
         }
-
-        function resetFullWater() {
-            document.getElementById('full-water-counter').textContent = '0ml';
+        
+        function updateWaterHistory() {
+            const historyContainer = document.getElementById('water-history');
+            historyContainer.innerHTML = '';
+            
+            if (waterHistory.length === 0) {
+                historyContainer.innerHTML = '<p>Δεν υπάρχει ιστορικό ακόμα</p>';
+                return;
+            }
+            
+            // Show only the last 5 entries
+            const recentHistory = waterHistory.slice(-5).reverse();
+            
+            recentHistory.forEach(entry => {
+                const entryElement = document.createElement('div');
+                entryElement.className = 'water-entry';
+                
+                let amountText = '';
+                if (entry.amount === 'RESET') {
+                    amountText = 'Επαναφορά';
+                } else if (entry.amount > 0) {
+                    amountText = `+${entry.amount}ml`;
+                } else {
+                    amountText = `${entry.amount}ml`;
+                }
+                
+                entryElement.innerHTML = `
+                    <div>${entry.time}</div>
+                    <div><strong>${amountText}</strong></div>
+                    <div>Σύνολο: ${entry.total}ml</div>
+                `;
+                historyContainer.appendChild(entryElement);
+            });
         }
-
+        
         // Keto Calculator
-        function calculateKeto(version) {
-            const weight = parseFloat(version === 'demo' 
-                ? document.getElementById('weight').value 
-                : document.getElementById('full-weight').value);
-                
-            const height = parseFloat(version === 'demo' 
-                ? document.getElementById('height').value 
-                : document.getElementById('full-height').value);
-                
-            const age = parseFloat(version === 'demo' 
-                ? document.getElementById('age').value 
-                : document.getElementById('full-age').value);
-                
-            const gender = version === 'demo' 
-                ? document.getElementById('gender').value 
-                : document.getElementById('full-gender').value;
+        function calculateKeto() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
             
             if (!weight || !height || !age) {
-                alert("Please fill in all fields");
+                alert("Παρακαλώ συμπληρώστε όλα τα πεδία");
                 return;
             }
             
-            const resultsContainer = version === 'demo' 
-                ? document.getElementById('keto-results')
-                : document.getElementById('full-keto-results');
-                
-            resultsContainer.innerHTML = `
+            // Calculate BMR (Basal Metabolic Rate)
+            let bmr;
+            if (gender === 'male') {
+                bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            } else {
+                bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
+            
+            // Calculate TDEE (Total Daily Energy Expenditure)
+            const tdee = bmr * activity;
+            
+            // Adjust for goal
+            let calories;
+            if (goal === 'loss') {
+                calories = tdee * 0.8; // 20% deficit
+            } else if (goal === 'gain') {
+                calories = tdee * 1.2; // 20% surplus
+            } else {
+                calories = tdee; // maintenance
+            }
+            
+            // Calculate macros (standard keto ratios)
+            const protein = (0.25 * calories) / 4; // 25% of calories from protein
+            const fat = (0.70 * calories) / 9; // 70% of calories from fat
+            const carbs = (0.05 * calories) / 4; // 5% of calories from carbs
+            
+            document.getElementById('keto-results').innerHTML = `
                 <div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; color: #2e7d32;">Your Macros</h3>
+                    <h3 style="margin-bottom: 15px; color: #2e7d32;">Τα Μακροθρεπτικά σας</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                         <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">1,850</div>
-                            <div style="color: #666;">Calories</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(calories)}</div>
+                            <div style="color: #666;">Θερμίδες</div>
                         </div>
                         <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">25g</div>
-                            <div style="color: #666;">Carbs</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(carbs)}g</div>
+                            <div style="color: #666;">Υδατάνθρακες</div>
                         </div>
                         <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">140g</div>
-                            <div style="color: #666;">Protein</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(protein)}g</div>
+                            <div style="color: #666;">Πρωτεΐνες</div>
                         </div>
                         <div style="text-align: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">145g</div>
-                            <div style="color: #666;">Fat</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">${Math.round(fat)}g</div>
+                            <div style="color: #666;">Λίπη</div>
                         </div>
                     </div>
-                    ${version === 'demo' ? `
-                    <div class="demo-limit" style="margin-top: 20px;">
-                        <i class="fas fa-lock"></i>
-                        <span>Upgrade for personalized plans, detailed analytics and data export</span>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p>Βάσει: ${gender === 'male' ? 'Αρσενικό' : 'Θηλυκό'}, ${age} ετών, ${weight}kg, ${height}cm</p>
+                        <p>Στόχος: ${goal === 'loss' ? 'Απώλεια βάρους' : goal === 'gain' ? 'Αύξηση βάρους' : 'Διατήρηση βάρους'}</p>
                     </div>
-                    ` : ''}
                 </div>
             `;
         }
-
-        // Meal Planner
-        function generateMealPlan() {
-            const mealContainer = document.getElementById('meal-plan-container');
-            mealContainer.innerHTML = '<div class="loader"></div>';
-            
-            setTimeout(() => {
-                mealContainer.innerHTML = '';
-                
-                const meals = [
-                    {
-                        id: 1,
-                        title: "Breakfast: Keto Omelette",
-                        image: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                        time: "8:00 AM"
-                    },
-                    {
-                        id: 2,
-                        title: "Lunch: Chicken Salad",
-                        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                        time: "1:00 PM"
-                    },
-                    {
-                        id: 3,
-                        title: "Dinner: Salmon & Veggies",
-                        image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                        time: "7:00 PM"
-                    }
-                ];
-                
-                meals.forEach(meal => {
-                    const mealCard = `
-                        <div class="recipe-card">
-                            <img src="${meal.image}" alt="${meal.title}">
-                            <h3>${meal.title}</h3>
-                            <div class="recipe-meta">
-                                <span><i class="fas fa-clock"></i> ${meal.time}</span>
-                                <span><i class="fas fa-fire"></i> ~450 cal</span>
-                            </div>
-                        </div>
-                    `;
-                    mealContainer.innerHTML += mealCard;
-                });
-            }, 1000);
-        }
-
+        
         // PWA Installation
         let deferredPrompt;
         const installButton = document.getElementById('install-button');
@@ -1229,7 +1172,7 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    installStatus.innerHTML = '<i class="fas fa-check-circle"></i> App installed successfully!';
+                    installStatus.innerHTML = '<i class="fas fa-check-circle"></i> Η εφαρμογή εγκαταστάθηκε επιτυχώς!';
                     installButton.style.display = 'none';
                     
                     // Create a download link
@@ -1241,34 +1184,40 @@
                     downloadLink.click();
                     document.body.removeChild(downloadLink);
                 } else {
-                    installStatus.textContent = 'Installation canceled.';
+                    installStatus.textContent = 'Η εγκατάσταση ακυρώθηκε.';
                 }
                 deferredPrompt = null;
             } else {
-                installStatus.textContent = 'App is already installed.';
+                installStatus.textContent = 'Η εφαρμογή είναι ήδη εγκατεστημένη.';
             }
         });
         
         // Check if app is already installed
         window.addEventListener('appinstalled', () => {
-            installStatus.innerHTML = '<i class="fas fa-check-circle"></i> App is already installed!';
+            installStatus.innerHTML = '<i class="fas fa-check-circle"></i> Η εφαρμογή είναι ήδη εγκατεστημένη!';
             installButton.style.display = 'none';
         });
 
         // Initialize content
         window.onload = function() {
-            // Fill inputs with demo values
-            document.getElementById('weight').value = 80;
-            document.getElementById('height').value = 175;
-            document.getElementById('age').value = 35;
-            
-            document.getElementById('full-weight').value = 80;
-            document.getElementById('full-height').value = 175;
-            document.getElementById('full-age').value = 35;
+            // Initialize food database
+            searchFood();
             
             // Initialize water tracker
-            document.getElementById('water-counter').textContent = '0ml';
-            document.getElementById('full-water-counter').textContent = '0ml';
+            updateWaterCounter();
+            updateWaterHistory();
+            
+            // Initialize progress charts
+            weightChart.update();
+            bodyfatChart.update();
+            
+            // Calculate initial keto macros
+            calculateKeto();
+            
+            // Show install message
+            if (!deferredPrompt) {
+                installStatus.innerHTML = 'Για πλήρη εμπειρία, εγκαταστήστε την εφαρμογή στον υπολογιστή ή κινητό σας.';
+            }
         };
     </script>
 </body>
