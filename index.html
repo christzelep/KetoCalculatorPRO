@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Keto Macro Calculator - Personalized Diet Planning">
-    <meta name="theme-color" content="#317EFB">
     <title>Keto Macro Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Base styles */
         :root {
             --primary: #4CAF50;
             --secondary: #2196F3;
@@ -29,10 +26,15 @@
             line-height: 1.6;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            min-height: 100vh;
         }
         
         header {
@@ -66,6 +68,7 @@
         .tagline {
             color: #666;
             font-size: 1.1rem;
+            margin-bottom: 15px;
         }
         
         .premium-badge {
@@ -75,14 +78,13 @@
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
-            margin-top: 10px;
             font-size: 0.9rem;
         }
         
         .version-switcher {
             display: flex;
             justify-content: center;
-            margin: 20px 0;
+            margin: 15px 0;
             gap: 15px;
         }
         
@@ -115,6 +117,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 25px;
+            margin-bottom: 30px;
         }
         
         .section {
@@ -152,7 +155,8 @@
         }
         
         input[type="text"], 
-        input[type="number"] {
+        input[type="number"],
+        select {
             flex: 1;
             padding: 14px;
             border: 1px solid #ddd;
@@ -161,7 +165,7 @@
             transition: border-color 0.3s;
         }
         
-        input:focus {
+        input:focus, select:focus {
             border-color: var(--secondary);
             outline: none;
             box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
@@ -456,168 +460,303 @@
             .modal-content {
                 margin: 20px 10px;
             }
+            
+            .version-switcher {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        /* Loading spinner */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hidden class for version switching */
+        .hidden {
+            display: none;
+        }
+        
+        /* Water tracker */
+        .water-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #water-counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+        
+        .water-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .water-buttons button {
+            padding: 12px 20px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
-        <p class="tagline">The most comprehensive tool for ketogenic diet planning</p>
-        <div class="premium-badge">PREMIUM EDITION</div>
-        
-        <div class="version-switcher">
-            <div class="version-btn demo-btn active" onclick="switchVersion('demo')">Demo Version</div>
-            <div class="version-btn full-btn" onclick="switchVersion('full')">Full Version</div>
-        </div>
-    </header>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Keto Macro Calculator</h1>
+            <p class="tagline">The most comprehensive tool for ketogenic diet planning</p>
+            <div class="premium-badge">PREMIUM EDITION</div>
+            
+            <div class="version-switcher">
+                <div class="version-btn demo-btn active" onclick="showDemo()">Demo Version</div>
+                <div class="version-btn full-btn" onclick="showFull()">Full Version</div>
+            </div>
+        </header>
 
-    <main>
-        <!-- Recipe Generator with Modal -->
-        <section class="section">
-            <h2><i class="fas fa-utensils"></i> Recipe Generator from Ingredients</h2>
-            <div class="input-group">
-                <input type="text" id="ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
-                <button onclick="generateRecipes()" class="secondary">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
-            
-            <div class="demo-limit" id="recipe-limit">
-                <i class="fas fa-info-circle"></i>
-                <span>Demo version: Shows up to 3 recipes. Upgrade for unlimited recipes and full details.</span>
-            </div>
-            
-            <div id="recipes-container" class="recipes-grid"></div>
-            
-            <!-- Recipe Detail Modal -->
-            <div id="recipe-modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="modal-title">Recipe</h3>
-                        <button class="close-modal">&times;</button>
+        <!-- Demo Version Content -->
+        <div id="demo-content">
+            <main>
+                <!-- Recipe Generator with Modal -->
+                <section class="section">
+                    <h2><i class="fas fa-utensils"></i> Recipe Generator from Ingredients</h2>
+                    <div class="input-group">
+                        <input type="text" id="ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
+                        <button onclick="generateRecipes('demo')" class="secondary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
                     </div>
-                    <div class="modal-body" id="modal-body">
-                        <!-- Recipe details will be loaded here -->
+                    
+                    <div class="demo-limit">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Demo version: Shows up to 3 recipes. Upgrade for unlimited recipes and full details.</span>
                     </div>
+                    
+                    <div id="recipes-container" class="recipes-grid"></div>
+                    
+                    <!-- Recipe Detail Modal -->
+                    <div id="recipe-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="modal-title">Recipe</h3>
+                                <button class="close-modal">&times;</button>
+                            </div>
+                            <div class="modal-body" id="modal-body">
+                                <!-- Recipe details will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Keto Calculator Section -->
+                <section class="section">
+                    <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
+                    <div class="input-group">
+                        <input type="number" id="weight" placeholder="Weight (kg)" />
+                        <input type="number" id="height" placeholder="Height (cm)" />
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="age" placeholder="Age" />
+                        <select id="gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <button onclick="calculateKeto('demo')">
+                        <i class="fas fa-calculator"></i> Calculate Macros
+                    </button>
+                    <div id="keto-results" style="margin-top: 20px;"></div>
+                </section>
+
+                <!-- Weight Loss Progress -->
+                <section class="section">
+                    <h2><i class="fas fa-chart-line"></i> Weight Loss Progress</h2>
+                    <div class="input-group">
+                        <input type="number" id="weight-input" placeholder="Weight (kg)" />
+                        <button onclick="addWeightEntry('demo')">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                    <canvas id="weight-chart" height="300"></canvas>
+                </section>
+
+                <!-- Water Tracker -->
+                <section class="section">
+                    <h2><i class="fas fa-tint"></i> Water Intake Tracker</h2>
+                    <div class="water-container">
+                        <div id="water-counter">0ml</div>
+                        <div class="water-buttons">
+                            <button onclick="addWater(250)">+250ml</button>
+                            <button onclick="addWater(500)">+500ml</button>
+                            <button onclick="resetWater()">Reset</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Upgrade Banner -->
+                <div class="upgrade-banner">
+                    <h3><i class="fas fa-crown"></i> Upgrade to Full Version</h3>
+                    <p>Unlock all features and get full access to the tool</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-infinity"></i>
+                            <h4>Unlimited Recipes</h4>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-chart-pie"></i>
+                            <h4>Detailed Analytics</h4>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-cloud-download-alt"></i>
+                            <h4>Data Export</h4>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-bell"></i>
+                            <h4>Personal Reminders</h4>
+                        </div>
+                    </div>
+                    
+                    <a href="https://gadgeteer70.gumroad.com/l/keto" target="_blank">
+                        <button class="premium">
+                            <i class="fas fa-lock-open"></i> Upgrade Now - $9.99
+                        </button>
+                    </a>
+                    <p style="margin-top: 15px; opacity: 0.9;">30-day money-back guarantee</p>
                 </div>
-            </div>
-        </section>
+            </main>
+        </div>
 
-        <!-- Keto Calculator Section -->
-        <section class="section">
-            <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
-            <div class="input-group">
-                <input type="number" id="weight" placeholder="Weight (kg)" />
-                <input type="number" id="height" placeholder="Height (cm)" />
-            </div>
-            <div class="input-group">
-                <input type="number" id="age" placeholder="Age" />
-                <select id="gender">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-            </div>
-            <button onclick="calculateKeto()">
-                <i class="fas fa-calculator"></i> Calculate Macros
+        <!-- Full Version Content -->
+        <div id="full-content" class="hidden">
+            <main>
+                <!-- Recipe Generator with Modal -->
+                <section class="section">
+                    <h2><i class="fas fa-utensils"></i> Recipe Generator from Ingredients</h2>
+                    <div class="input-group">
+                        <input type="text" id="full-ingredients" placeholder="Enter ingredients (e.g., eggs, bacon, avocado)" />
+                        <button onclick="generateRecipes('full')" class="secondary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <div id="full-recipes-container" class="recipes-grid"></div>
+                    
+                    <!-- Recipe Detail Modal -->
+                    <div id="full-recipe-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="full-modal-title">Recipe</h3>
+                                <button class="close-modal">&times;</button>
+                            </div>
+                            <div class="modal-body" id="full-modal-body">
+                                <!-- Recipe details will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Keto Calculator Section -->
+                <section class="section">
+                    <h2><i class="fas fa-heartbeat"></i> Keto Calculator</h2>
+                    <div class="input-group">
+                        <input type="number" id="full-weight" placeholder="Weight (kg)" />
+                        <input type="number" id="full-height" placeholder="Height (cm)" />
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="full-age" placeholder="Age" />
+                        <select id="full-gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <button onclick="calculateKeto('full')">
+                        <i class="fas fa-calculator"></i> Calculate Macros
+                    </button>
+                    <div id="full-keto-results" style="margin-top: 20px;"></div>
+                </section>
+
+                <!-- Weight Loss Progress -->
+                <section class="section">
+                    <h2><i class="fas fa-chart-line"></i> Weight Loss Progress</h2>
+                    <div class="input-group">
+                        <input type="number" id="full-weight-input" placeholder="Weight (kg)" />
+                        <button onclick="addWeightEntry('full')">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                    <canvas id="full-weight-chart" height="300"></canvas>
+                    <div id="full-weight-history" style="margin-top: 20px;"></div>
+                </section>
+
+                <!-- Water Tracker -->
+                <section class="section">
+                    <h2><i class="fas fa-tint"></i> Water Intake Tracker</h2>
+                    <div class="water-container">
+                        <div id="full-water-counter">0ml</div>
+                        <div class="water-buttons">
+                            <button onclick="addFullWater(250)">+250ml</button>
+                            <button onclick="addFullWater(500)">+500ml</button>
+                            <button onclick="resetFullWater()">Reset</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Meal Planner -->
+                <section class="section">
+                    <h2><i class="fas fa-calendar-alt"></i> Meal Planner</h2>
+                    <div id="meal-plan-container" class="recipes-grid"></div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="generateMealPlan()">
+                            <i class="fas fa-plus"></i> Generate Meal Plan
+                        </button>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- PWA Installation -->
+        <div id="install-container">
+            <h3><i class="fas fa-mobile-alt"></i> Install Our Application</h3>
+            <p>Access your keto plan anytime, even offline</p>
+            <button id="install-button">
+                <i class="fas fa-download"></i> Install
             </button>
-            <div id="keto-results" style="margin-top: 20px;"></div>
-        </section>
-
-        <!-- Weight Loss Progress -->
-        <section class="section">
-            <h2><i class="fas fa-chart-line"></i> Weight Loss Progress</h2>
-            <div class="input-group">
-                <input type="number" id="weight-input" placeholder="Weight (kg)" />
-                <button onclick="addWeightEntry()">
-                    <i class="fas fa-save"></i> Save
-                </button>
-            </div>
-            <canvas id="weight-chart" height="300"></canvas>
-        </section>
-
-        <!-- Water Tracker -->
-        <section class="section">
-            <h2><i class="fas fa-tint"></i> Water Intake Tracker</h2>
-            <div class="input-group" style="justify-content: center;">
-                <div id="water-counter">0ml</div>
-            </div>
-            <div class="input-group">
-                <button onclick="addWater(250)">+250ml</button>
-                <button onclick="addWater(500)">+500ml</button>
-                <button onclick="resetWater()">Reset</button>
-            </div>
-        </section>
-
-        <!-- Upgrade Banner -->
-        <div class="upgrade-banner" id="upgrade-banner">
-            <h3><i class="fas fa-crown"></i> Upgrade to Full Version</h3>
-            <p>Unlock all features and get full access to the tool</p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-infinity"></i>
-                    <h4>Unlimited Recipes</h4>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-chart-pie"></i>
-                    <h4>Detailed Analytics</h4>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-cloud-download-alt"></i>
-                    <h4>Data Export</h4>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-bell"></i>
-                    <h4>Personal Reminders</h4>
-                </div>
-            </div>
-            
-            <a href="https://gadgeteer70.gumroad.com/l/keto" target="_blank">
-                <button class="premium">
-                    <i class="fas fa-lock-open"></i> Upgrade Now - $9.99
-                </button>
-            </a>
-            <p style="margin-top: 15px; opacity: 0.9;">30-day money-back guarantee</p>
+            <p id="install-status">For full experience, install the app on your device</p>
         </div>
-    </main>
 
-    <!-- PWA Installation -->
-    <div id="install-container">
-        <h3><i class="fas fa-mobile-alt"></i> Install Our Application</h3>
-        <p>Access your keto plan anytime, even offline</p>
-        <button id="install-button">
-            <i class="fas fa-download"></i> Install
-        </button>
-        <p id="install-status">For full experience, install the app on your device</p>
+        <footer>
+            <p>&copy; 2023 Keto Macro Calculator | Made with <i class="fas fa-heart" style="color:#e74c3c"></i></p>
+        </footer>
     </div>
-
-    <footer>
-        <p>&copy; 2023 Keto Macro Calculator | Made with <i class="fas fa-heart" style="color:#e74c3c"></i></p>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Version control
-        let currentVersion = 'demo';
+        function showDemo() {
+            document.getElementById('demo-content').classList.remove('hidden');
+            document.getElementById('full-content').classList.add('hidden');
+            document.querySelector('.demo-btn').classList.add('active');
+            document.querySelector('.full-btn').classList.remove('active');
+        }
         
-        function switchVersion(version) {
-            currentVersion = version;
-            document.querySelectorAll('.version-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            if (version === 'demo') {
-                document.querySelector('.demo-btn').classList.add('active');
-                document.getElementById('upgrade-banner').style.display = 'block';
-                document.getElementById('recipe-limit').style.display = 'flex';
-            } else {
-                document.querySelector('.full-btn').classList.add('active');
-                document.getElementById('upgrade-banner').style.display = 'none';
-                document.getElementById('recipe-limit').style.display = 'none';
-            }
-            
-            // Refresh content
-            generateRecipes();
+        function showFull() {
+            document.getElementById('demo-content').classList.add('hidden');
+            document.getElementById('full-content').classList.remove('hidden');
+            document.querySelector('.demo-btn').classList.remove('active');
+            document.querySelector('.full-btn').classList.add('active');
         }
         
         // Recipe Generator with Modal
@@ -699,39 +838,89 @@
             }
         ];
 
-        function generateRecipes() {
-            const ingredients = document.getElementById('ingredients').value;
+        const fullRecipes = [
+            ...recipes,
+            {
+                id: 6,
+                title: "Zucchini Noodles with Pesto",
+                image: "https://images.unsplash.com/photo-1590005024862-6b67679a29fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                calories: 320,
+                time: 25,
+                ingredients: ["2 large zucchinis", "1/2 cup basil pesto", "1/4 cup pine nuts", "1/4 cup grated parmesan", "2 tbsp olive oil"],
+                instructions: [
+                    "Spiralize zucchinis into noodles.",
+                    "Heat olive oil in a pan over medium heat.",
+                    "Add zucchini noodles and sauté for 3-4 minutes.",
+                    "Remove from heat and mix in pesto.",
+                    "Top with pine nuts and parmesan before serving."
+                ]
+            },
+            {
+                id: 7,
+                title: "Cauliflower Pizza",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                calories: 380,
+                time: 40,
+                ingredients: ["1 head cauliflower", "1 egg", "1 cup shredded mozzarella", "1/2 cup tomato sauce", "toppings of choice"],
+                instructions: [
+                    "Preheat oven to 200°C.",
+                    "Rice cauliflower and microwave for 5 minutes.",
+                    "Mix cauliflower with egg and mozzarella.",
+                    "Form into pizza crust and bake for 20 minutes.",
+                    "Add sauce and toppings, bake for additional 10 minutes."
+                ]
+            }
+        ];
+
+        function generateRecipes(version) {
+            const ingredients = version === 'demo' 
+                ? document.getElementById('ingredients').value 
+                : document.getElementById('full-ingredients').value;
+                
             if (!ingredients) return;
             
-            const recipesContainer = document.getElementById('recipes-container');
-            recipesContainer.innerHTML = '';
+            const recipesContainer = version === 'demo' 
+                ? document.getElementById('recipes-container')
+                : document.getElementById('full-recipes-container');
+                
+            recipesContainer.innerHTML = '<div class="loader"></div>';
             
-            // Demo limitation - only show 3 recipes
-            const showRecipes = currentVersion === 'demo' ? recipes.slice(0, 3) : recipes;
-            
-            showRecipes.forEach(recipe => {
-                const recipeCard = `
-                    <div class="recipe-card" onclick="showRecipeDetail(${recipe.id})">
-                        <img src="${recipe.image}" alt="${recipe.title}">
-                        <h3>${recipe.title}</h3>
-                        <div class="recipe-meta">
-                            <span><i class="fas fa-fire"></i> ${recipe.calories} calories</span>
-                            <span><i class="fas fa-clock"></i> ${recipe.time} min</span>
+            // Simulate API call delay
+            setTimeout(() => {
+                recipesContainer.innerHTML = '';
+                
+                // Demo limitation - only show 3 recipes
+                const showRecipes = version === 'demo' 
+                    ? recipes.slice(0, 3) 
+                    : fullRecipes;
+                
+                showRecipes.forEach(recipe => {
+                    const recipeCard = `
+                        <div class="recipe-card" onclick="showRecipeDetail(${recipe.id}, '${version}')">
+                            <img src="${recipe.image}" alt="${recipe.title}">
+                            <h3>${recipe.title}</h3>
+                            <div class="recipe-meta">
+                                <span><i class="fas fa-fire"></i> ${recipe.calories} calories</span>
+                                <span><i class="fas fa-clock"></i> ${recipe.time} min</span>
+                            </div>
                         </div>
-                    </div>
-                `;
-                recipesContainer.innerHTML += recipeCard;
-            });
+                    `;
+                    recipesContainer.innerHTML += recipeCard;
+                });
+            }, 1000);
         }
 
-        function showRecipeDetail(recipeId) {
-            const recipe = recipes.find(r => r.id === recipeId);
+        function showRecipeDetail(recipeId, version) {
+            const recipe = (version === 'demo' ? recipes : fullRecipes).find(r => r.id === recipeId);
             if (!recipe) return;
             
-            document.getElementById('modal-title').textContent = recipe.title;
+            const modalId = version === 'demo' ? 'recipe-modal' : 'full-recipe-modal';
+            const modalTitle = version === 'demo' ? 'modal-title' : 'full-modal-title';
+            const modalBody = version === 'demo' ? 'modal-body' : 'full-modal-body';
             
-            const modalBody = document.getElementById('modal-body');
-            modalBody.innerHTML = `
+            document.getElementById(modalTitle).textContent = recipe.title;
+            
+            document.getElementById(modalBody).innerHTML = `
                 <div class="recipe-detail">
                     <div>
                         <img src="${recipe.image}" alt="${recipe.title}">
@@ -756,7 +945,7 @@
                             </ol>
                         </div>
                         
-                        ${currentVersion === 'demo' ? `
+                        ${version === 'demo' ? `
                         <div class="demo-limit">
                             <i class="fas fa-lock"></i>
                             <span>Upgrade to access 500+ recipes and save functionality</span>
@@ -774,20 +963,25 @@
                 </div>
             `;
             
-            document.getElementById('recipe-modal').style.display = 'block';
+            document.getElementById(modalId).style.display = 'block';
         }
 
         // Close modal function
-        document.querySelector('.close-modal').addEventListener('click', function() {
-            document.getElementById('recipe-modal').style.display = 'none';
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            });
         });
 
         // Close modal if clicked outside
         window.addEventListener('click', function(event) {
-            const modal = document.getElementById('recipe-modal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
 
         // Weight Loss Chart
@@ -821,45 +1015,129 @@
             }
         });
 
-        function addWeightEntry() {
-            const weight = parseFloat(document.getElementById('weight-input').value);
+        const fullWeightChart = new Chart(document.getElementById('full-weight-chart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: [],
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Weight Loss Progress'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        function addWeightEntry(version) {
+            const weightInput = version === 'demo' 
+                ? document.getElementById('weight-input')
+                : document.getElementById('full-weight-input');
+                
+            const weight = parseFloat(weightInput.value);
             if (!weight) return;
             
-            if (currentVersion === 'demo') {
+            if (version === 'demo') {
                 alert(`Weight ${weight}kg recorded! Upgrade for full history and statistics.`);
             } else {
-                alert(`Weight ${weight}kg saved successfully!`);
+                const now = new Date();
+                const dateLabel = `${now.getDate()}/${now.getMonth() + 1}`;
+                
+                // Update chart
+                fullWeightChart.data.labels.push(dateLabel);
+                fullWeightChart.data.datasets[0].data.push(weight);
+                fullWeightChart.update();
+                
+                // Update history
+                updateWeightHistory();
             }
-            document.getElementById('weight-input').value = '';
+            
+            weightInput.value = '';
+        }
+
+        function updateWeightHistory() {
+            const historyContainer = document.getElementById('full-weight-history');
+            if (!historyContainer) return;
+            
+            if (fullWeightChart.data.labels.length === 0) {
+                historyContainer.innerHTML = '<p>No weight entries yet</p>';
+                return;
+            }
+            
+            let historyHTML = '<h3>Weight History:</h3><ul>';
+            fullWeightChart.data.labels.forEach((label, index) => {
+                historyHTML += `<li>${label}: ${fullWeightChart.data.datasets[0].data[index]}kg</li>`;
+            });
+            historyHTML += '</ul>';
+            historyContainer.innerHTML = historyHTML;
         }
 
         // Water Tracker
         function addWater(amount) {
-            const current = parseInt(localStorage.getItem('waterIntake') || 0;
+            const waterCounter = document.getElementById('water-counter');
+            const current = parseInt(waterCounter.textContent) || 0;
             const newTotal = current + amount;
-            localStorage.setItem('waterIntake', newTotal);
-            document.getElementById('water-counter').textContent = `${newTotal}ml`;
+            waterCounter.textContent = `${newTotal}ml`;
         }
 
         function resetWater() {
-            localStorage.setItem('waterIntake', '0');
             document.getElementById('water-counter').textContent = '0ml';
         }
 
+        function addFullWater(amount) {
+            const waterCounter = document.getElementById('full-water-counter');
+            const current = parseInt(waterCounter.textContent) || 0;
+            const newTotal = current + amount;
+            waterCounter.textContent = `${newTotal}ml`;
+        }
+
+        function resetFullWater() {
+            document.getElementById('full-water-counter').textContent = '0ml';
+        }
+
         // Keto Calculator
-        function calculateKeto() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const age = parseFloat(document.getElementById('age').value);
-            const gender = document.getElementById('gender').value;
+        function calculateKeto(version) {
+            const weight = parseFloat(version === 'demo' 
+                ? document.getElementById('weight').value 
+                : document.getElementById('full-weight').value);
+                
+            const height = parseFloat(version === 'demo' 
+                ? document.getElementById('height').value 
+                : document.getElementById('full-height').value);
+                
+            const age = parseFloat(version === 'demo' 
+                ? document.getElementById('age').value 
+                : document.getElementById('full-age').value);
+                
+            const gender = version === 'demo' 
+                ? document.getElementById('gender').value 
+                : document.getElementById('full-gender').value;
             
             if (!weight || !height || !age) {
                 alert("Please fill in all fields");
                 return;
             }
             
-            // Demo version - fixed results
-            document.getElementById('keto-results').innerHTML = `
+            const resultsContainer = version === 'demo' 
+                ? document.getElementById('keto-results')
+                : document.getElementById('full-keto-results');
+                
+            resultsContainer.innerHTML = `
                 <div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">
                     <h3 style="margin-bottom: 15px; color: #2e7d32;">Your Macros</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
@@ -880,7 +1158,7 @@
                             <div style="color: #666;">Fat</div>
                         </div>
                     </div>
-                    ${currentVersion === 'demo' ? `
+                    ${version === 'demo' ? `
                     <div class="demo-limit" style="margin-top: 20px;">
                         <i class="fas fa-lock"></i>
                         <span>Upgrade for personalized plans, detailed analytics and data export</span>
@@ -888,6 +1166,51 @@
                     ` : ''}
                 </div>
             `;
+        }
+
+        // Meal Planner
+        function generateMealPlan() {
+            const mealContainer = document.getElementById('meal-plan-container');
+            mealContainer.innerHTML = '<div class="loader"></div>';
+            
+            setTimeout(() => {
+                mealContainer.innerHTML = '';
+                
+                const meals = [
+                    {
+                        id: 1,
+                        title: "Breakfast: Keto Omelette",
+                        image: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        time: "8:00 AM"
+                    },
+                    {
+                        id: 2,
+                        title: "Lunch: Chicken Salad",
+                        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        time: "1:00 PM"
+                    },
+                    {
+                        id: 3,
+                        title: "Dinner: Salmon & Veggies",
+                        image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                        time: "7:00 PM"
+                    }
+                ];
+                
+                meals.forEach(meal => {
+                    const mealCard = `
+                        <div class="recipe-card">
+                            <img src="${meal.image}" alt="${meal.title}">
+                            <h3>${meal.title}</h3>
+                            <div class="recipe-meta">
+                                <span><i class="fas fa-clock"></i> ${meal.time}</span>
+                                <span><i class="fas fa-fire"></i> ~450 cal</span>
+                            </div>
+                        </div>
+                    `;
+                    mealContainer.innerHTML += mealCard;
+                });
+            }, 1000);
         }
 
         // PWA Installation
@@ -908,6 +1231,15 @@
                 if (outcome === 'accepted') {
                     installStatus.innerHTML = '<i class="fas fa-check-circle"></i> App installed successfully!';
                     installButton.style.display = 'none';
+                    
+                    // Create a download link
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = 'keto-app.html';
+                    downloadLink.download = 'keto-macro-calculator.html';
+                    downloadLink.style.display = 'none';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
                 } else {
                     installStatus.textContent = 'Installation canceled.';
                 }
@@ -925,16 +1257,18 @@
 
         // Initialize content
         window.onload = function() {
-            generateRecipes();
-            
             // Fill inputs with demo values
             document.getElementById('weight').value = 80;
             document.getElementById('height').value = 175;
             document.getElementById('age').value = 35;
             
+            document.getElementById('full-weight').value = 80;
+            document.getElementById('full-height').value = 175;
+            document.getElementById('full-age').value = 35;
+            
             // Initialize water tracker
-            document.getElementById('water-counter').textContent = 
-                `${localStorage.getItem('waterIntake') || 0}ml`;
+            document.getElementById('water-counter').textContent = '0ml';
+            document.getElementById('full-water-counter').textContent = '0ml';
         };
     </script>
 </body>
